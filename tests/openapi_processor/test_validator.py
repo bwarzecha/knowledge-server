@@ -76,7 +76,10 @@ class TestOpenAPIValidator:
 
     def test_validate_missing_paths_and_components(self):
         """Test validation failure when both paths and components are missing."""
-        spec_data = {"openapi": "3.0.0", "info": {"title": "Test API", "version": "1.0.0"}}
+        spec_data = {
+            "openapi": "3.0.0",
+            "info": {"title": "Test API", "version": "1.0.0"},
+        }
 
         validator = OpenAPIValidator()
         result = validator.validate(spec_data)

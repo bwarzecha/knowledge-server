@@ -91,7 +91,9 @@ class KnowledgeRetriever:
             max_references = total_limit - len(primary_chunks)
             if max_references > 0:
                 referenced_chunks, expansion_stats = self.reference_expander.expand_references(
-                    primary_chunks=primary_chunks, max_depth=depth_limit, max_total=max_references
+                    primary_chunks=primary_chunks,
+                    max_depth=depth_limit,
+                    max_total=max_references,
                 )
                 logger.info(f"Expanded to {len(referenced_chunks)} referenced chunks")
             else:

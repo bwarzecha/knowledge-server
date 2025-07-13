@@ -79,11 +79,19 @@ class TestResearchAgentTools:
 
         # Execute
         actual = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="pet operations", max_chunks=5
+            vector_store=vector_store,
+            api_context=api_context,
+            query="pet operations",
+            max_chunks=5,
         )
 
         # Expected
-        expected_structure = {"has_results": True, "max_chunks": 5, "has_files_searched": True, "has_api_context": True}
+        expected_structure = {
+            "has_results": True,
+            "max_chunks": 5,
+            "has_files_searched": True,
+            "has_api_context": True,
+        }
 
         # Assert
         assert actual.total_found > 0
@@ -97,7 +105,13 @@ class TestResearchAgentTools:
             assert chunk.chunk_id
             assert chunk.title
             assert chunk.content_preview
-            assert chunk.chunk_type in ["operation", "component", "schema", "info", "unknown"]
+            assert chunk.chunk_type in [
+                "operation",
+                "component",
+                "schema",
+                "info",
+                "unknown",
+            ]
             assert chunk.file_name
             assert 0.0 <= chunk.relevance_score <= 1.0
             assert isinstance(chunk.ref_ids, list)
@@ -144,12 +158,20 @@ class TestResearchAgentTools:
 
         # Execute - search with filter
         actual_filtered = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="API", max_chunks=5, file_filter="train-travel"
+            vector_store=vector_store,
+            api_context=api_context,
+            query="API",
+            max_chunks=5,
+            file_filter="train-travel",
         )
 
         # Execute - search without filter
         actual_unfiltered = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="API", max_chunks=5, file_filter=None
+            vector_store=vector_store,
+            api_context=api_context,
+            query="API",
+            max_chunks=5,
+            file_filter=None,
         )
 
         # Expected: filtered results should be smaller and match the filter
@@ -172,7 +194,11 @@ class TestResearchAgentTools:
 
         # Execute
         actual = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="pet", max_chunks=5, file_filter="nonexistent-api"
+            vector_store=vector_store,
+            api_context=api_context,
+            query="pet",
+            max_chunks=5,
+            file_filter="nonexistent-api",
         )
 
         # Expected
@@ -192,7 +218,10 @@ class TestResearchAgentTools:
 
         # Get some chunk IDs first
         search_results = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="pet", max_chunks=3
+            vector_store=vector_store,
+            api_context=api_context,
+            query="pet",
+            max_chunks=3,
         )
         chunk_ids = [chunk.chunk_id for chunk in search_results.chunks[:2]]
 
@@ -233,7 +262,11 @@ class TestResearchAgentTools:
 
         # Find a chunk with references
         search_results = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="schema", max_chunks=5, include_references=True
+            vector_store=vector_store,
+            api_context=api_context,
+            query="schema",
+            max_chunks=5,
+            include_references=True,
         )
 
         chunk_with_refs = None
@@ -247,7 +280,10 @@ class TestResearchAgentTools:
 
         # Execute
         actual = await getChunks(
-            vector_store=vector_store, chunk_ids=[chunk_with_refs.chunk_id], expand_depth=2, max_total_chunks=10
+            vector_store=vector_store,
+            chunk_ids=[chunk_with_refs.chunk_id],
+            expand_depth=2,
+            max_total_chunks=10,
         )
 
         # Expected
@@ -276,7 +312,11 @@ class TestResearchAgentTools:
 
         # Get a chunk with references for expansion
         search_results = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="complex", max_chunks=1, include_references=True
+            vector_store=vector_store,
+            api_context=api_context,
+            query="complex",
+            max_chunks=1,
+            include_references=True,
         )
 
         chunk_with_refs = None
@@ -337,7 +377,11 @@ class TestResearchAgentTools:
 
         # Search for chunks from the circular.json file
         search_results = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="circular", max_chunks=1, file_filter="circular"
+            vector_store=vector_store,
+            api_context=api_context,
+            query="circular",
+            max_chunks=1,
+            file_filter="circular",
         )
 
         if search_results.total_found == 0:
@@ -463,7 +507,11 @@ class TestResearchAgentTools:
 
         # Execute search across workshop files
         actual = await searchChunks(
-            vector_store=vector_store, api_context=api_context, query="get post", max_chunks=5, file_filter="workshop"
+            vector_store=vector_store,
+            api_context=api_context,
+            query="get post",
+            max_chunks=5,
+            file_filter="workshop",
         )
 
         # Expected: should find multiple files and workshop files

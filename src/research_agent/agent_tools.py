@@ -13,7 +13,10 @@ logger = logging.getLogger(__name__)
 
 @tool
 async def search_chunks_tool(
-    query: str, max_chunks: int = 25, file_filter: Optional[str] = None, include_references: bool = False
+    query: str,
+    max_chunks: int = 25,
+    file_filter: Optional[str] = None,
+    include_references: bool = False,
 ) -> dict:
     """Search API documentation chunks with optional file filtering.
 
@@ -107,4 +110,3 @@ async def get_chunks_tool(chunk_ids: List[str], expand_depth: int = 3, max_total
         "expansion_stats": result.expansion_stats,
         "truncated": result.truncated,
     }
-

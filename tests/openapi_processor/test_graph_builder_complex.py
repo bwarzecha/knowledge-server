@@ -186,7 +186,14 @@ class TestGraphBuilderComplex:
             },
             {
                 "id": "test.json:schemas/A",
-                "content": {"A": {"properties": {"b": {"$ref": "#/schemas/B"}, "c": {"$ref": "#/schemas/C"}}}},
+                "content": {
+                    "A": {
+                        "properties": {
+                            "b": {"$ref": "#/schemas/B"},
+                            "c": {"$ref": "#/schemas/C"},
+                        }
+                    }
+                },
                 "metadata": {"type": "component", "source_file": "test.json"},
             },
         ]
@@ -279,7 +286,14 @@ class TestGraphBuilderComplex:
                     ]
                 }
             },
-            "test.json:schemas/B": {"ref_ids": {"test.json:schemas/C": ["test.json:schemas/D", "test.json:schemas/E"]}},
+            "test.json:schemas/B": {
+                "ref_ids": {
+                    "test.json:schemas/C": [
+                        "test.json:schemas/D",
+                        "test.json:schemas/E",
+                    ]
+                }
+            },
             "test.json:schemas/C": {"ref_ids": {"test.json:schemas/D": ["test.json:schemas/E"]}},
             "test.json:schemas/D": {"ref_ids": {"test.json:schemas/E": []}},
             "test.json:schemas/E": {"ref_ids": {}},

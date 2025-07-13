@@ -32,7 +32,10 @@ class LocalLLMProvider(LLMProvider):
 
             logger.info(f"Loading model from {self.repo_id}/{self.filename}...")
             self._llm = Llama.from_pretrained(
-                repo_id=self.repo_id, filename=self.filename, n_ctx=self.n_ctx, verbose=False
+                repo_id=self.repo_id,
+                filename=self.filename,
+                n_ctx=self.n_ctx,
+                verbose=False,
             )
             self._available = True
             logger.info("✅ Model loaded successfully")
@@ -63,7 +66,10 @@ class LocalLLMProvider(LLMProvider):
             messages = [{"role": "user", "content": prompt}]
 
             response = self._llm.create_chat_completion(
-                messages=messages, max_tokens=max_tokens, temperature=temperature, stream=False
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=False,
             )
 
             content = response["choices"][0]["message"]["content"]

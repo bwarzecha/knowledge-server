@@ -49,7 +49,9 @@ Status: not initialized"""
         # Assemble response with length constraints
         assembler = ResponseAssembler()
         response = assembler.assemble_response(
-            context=context, max_response_length=max_response_length, format_style="detailed"
+            context=context,
+            max_response_length=max_response_length,
+            format_style="detailed",
         )
 
         return response

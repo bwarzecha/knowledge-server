@@ -50,4 +50,3 @@ class RetrievalResults:
     total_tokens: int
     expansion_stats: Dict[int, int]  # depth -> chunk count
     truncated: bool
-

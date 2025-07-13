@@ -27,6 +27,11 @@ class Config:
         self.supported_extensions = os.getenv("SUPPORTED_EXTENSIONS", ".json,.yaml,.yml").split(",")
         self.log_processing_progress = os.getenv("LOG_PROCESSING_PROGRESS", "true").lower() == "true"
 
+        # Markdown Processing
+        self.markdown_source_dir = os.getenv("MARKDOWN_SOURCE_DIR", self.openapi_specs_dir)
+        self.markdown_max_tokens = int(os.getenv("MARKDOWN_MAX_TOKENS", "1000"))
+        self.markdown_file_extensions = os.getenv("MARKDOWN_FILE_EXTENSIONS", ".md,.markdown").split(",")
+
         # Vector Store
         self.vector_store_dir = os.getenv("VECTOR_STORE_DIR", "./data/vectorstore")
         self.vector_store_collection = os.getenv("VECTOR_STORE_COLLECTION", "knowledge_base")

@@ -60,7 +60,12 @@ class ElementExtractor:
 
         metadata = {"type": "info", "source_file": spec_name, "natural_name": "info"}
 
-        return ExtractedElement(element_id=element_id, element_type="info", content=content, metadata=metadata)
+        return ExtractedElement(
+            element_id=element_id,
+            element_type="info",
+            content=content,
+            metadata=metadata,
+        )
 
     def _extract_tags(self, spec: Dict[str, Any], spec_name: str) -> Optional[ExtractedElement]:
         """Extract the tags section."""
@@ -72,7 +77,12 @@ class ElementExtractor:
 
         metadata = {"type": "tags", "source_file": spec_name, "natural_name": "tags"}
 
-        return ExtractedElement(element_id=element_id, element_type="tags", content=content, metadata=metadata)
+        return ExtractedElement(
+            element_id=element_id,
+            element_type="tags",
+            content=content,
+            metadata=metadata,
+        )
 
     def _extract_operations(self, spec: Dict[str, Any], spec_name: str) -> List[ExtractedElement]:
         """Extract operations from the paths section."""
@@ -90,7 +100,16 @@ class ElementExtractor:
                 continue
 
             # Extract each HTTP method as a separate operation
-            http_methods = ["get", "post", "put", "delete", "options", "head", "patch", "trace"]
+            http_methods = [
+                "get",
+                "post",
+                "put",
+                "delete",
+                "options",
+                "head",
+                "patch",
+                "trace",
+            ]
 
             for method in http_methods:
                 if method in path_item:
@@ -127,7 +146,12 @@ class ElementExtractor:
             "tags": tags if isinstance(tags, list) else [],
         }
 
-        return ExtractedElement(element_id=element_id, element_type="operation", content=content, metadata=metadata)
+        return ExtractedElement(
+            element_id=element_id,
+            element_type="operation",
+            content=content,
+            metadata=metadata,
+        )
 
     def _extract_components(self, spec: Dict[str, Any], spec_name: str) -> List[ExtractedElement]:
         """Extract components from the components section."""
@@ -153,7 +177,11 @@ class ElementExtractor:
         return components
 
     def _extract_single_component(
-        self, component_type: str, component_name: str, component_data: Any, spec_name: str
+        self,
+        component_type: str,
+        component_name: str,
+        component_data: Any,
+        spec_name: str,
     ) -> Optional[ExtractedElement]:
         """Extract a single component."""
         # Create element ID: spec_name:components/{type}/{name}
@@ -170,4 +198,9 @@ class ElementExtractor:
             "component_name": component_name,
         }
 
-        return ExtractedElement(element_id=element_id, element_type="component", content=content, metadata=metadata)
+        return ExtractedElement(
+            element_id=element_id,
+            element_type="component",
+            content=content,
+            metadata=metadata,
+        )

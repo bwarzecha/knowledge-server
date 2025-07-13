@@ -72,7 +72,10 @@ class TestMetadataUtils:
         """Test restoration of complex metadata from JSON strings."""
         import json
 
-        original_ref_ids = {"api.json:User": ["api.json:Address"], "api.json:Company": []}
+        original_ref_ids = {
+            "api.json:User": ["api.json:Address"],
+            "api.json:Company": [],
+        }
         original_referenced_by = ["api.json:paths/users/get"]
 
         chromadb_metadata = {
@@ -135,7 +138,11 @@ class TestMetadataUtils:
 
     def test_handle_none_values(self):
         """Test handling of None values in metadata."""
-        metadata = {"source_file": "api.json", "optional_field": None, "chunk_type": "definition"}
+        metadata = {
+            "source_file": "api.json",
+            "optional_field": None,
+            "chunk_type": "definition",
+        }
 
         chromadb_format = prepare_metadata_for_chromadb(metadata)
         restored_format = restore_metadata_from_chromadb(chromadb_format)

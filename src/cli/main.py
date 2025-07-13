@@ -19,14 +19,25 @@ from src.utils.logging_config import setup_logging
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        prog="knowledge-server", description="Knowledge Server - MCP server for API documentation"
+        prog="knowledge-server",
+        description="Knowledge Server - MCP server for API documentation",
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Index command
-    index_parser = subparsers.add_parser("index", help="Build vector store and API index from OpenAPI specifications")
+    index_parser = subparsers.add_parser(
+        "index", help="Build vector store and API index from OpenAPI specs and markdown files"
+    )
     index_parser.add_argument("--config", help="Path to .env configuration file", default=None)
+    index_parser.add_argument("--skip-openapi", action="store_true", help="Skip processing OpenAPI specifications")
+    index_parser.add_argument("--skip-markdown", action="store_true", help="Skip processing markdown files")
+    index_parser.add_argument(
+        "--max-tokens", type=int, help="Maximum tokens per markdown chunk (default: 1000, max: 8000)"
+    )
+    index_parser.add_argument(
+        "--markdown-dir", help="Directory containing markdown files (default: same as OpenAPI specs directory)"
+    )
 
     # Serve command
     serve_parser = subparsers.add_parser("serve", help="Start MCP server using pre-built indices")
@@ -47,21 +58,41 @@ def main():
         default=4000,
         help="Maximum response length in tokens (default: 4000)",
     )
-    ask_parser.add_argument("--max-chunks", type=int, default=50, help="Maximum chunks to retrieve (default: 50)")
+    ask_parser.add_argument(
+        "--max-chunks",
+        type=int,
+        default=50,
+        help="Maximum chunks to retrieve (default: 50)",
+    )
     ask_parser.add_argument(
         "--no-references",
         action="store_true",
         help="Disable reference following for faster responses",
     )
-    ask_parser.add_argument("--max-depth", type=int, default=3, help="Maximum reference expansion depth (default: 3)")
+    ask_parser.add_argument(
+        "--max-depth",
+        type=int,
+        default=3,
+        help="Maximum reference expansion depth (default: 3)",
+    )
     ask_parser.add_argument("--config", help="Path to .env configuration file", default=None)
-    ask_parser.add_argument("-v", "--verbose", action="store_true", help="Show detailed processing information")
+    ask_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Show detailed processing information",
+    )
 
     # Research command
     research_parser = subparsers.add_parser("research", help="Research questions using intelligent ReAct agent")
     research_parser.add_argument("question", help="Research question about API documentation")
     research_parser.add_argument("--config", help="Path to .env configuration file", default=None)
-    research_parser.add_argument("-v", "--verbose", action="store_true", help="Show detailed processing information")
+    research_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Show detailed processing information",
+    )
 
     args = parser.parse_args()
 
@@ -82,7 +113,13 @@ def main():
 
     # Execute command
     if args.command == "index":
-        index_command(config)
+        index_command(
+            config=config,
+            skip_openapi=args.skip_openapi,
+            skip_markdown=args.skip_markdown,
+            max_tokens=args.max_tokens,
+            markdown_dir=args.markdown_dir,
+        )
     elif args.command == "serve":
         serve_command(config, verbose=verbose)
     elif args.command == "ask":

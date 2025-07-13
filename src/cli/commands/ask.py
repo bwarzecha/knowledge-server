@@ -27,7 +27,15 @@ def ask_command(
 ):
     """Ask questions about API documentation using the searchAPI functionality."""
     asyncio.run(
-        _ask_command_async(config, query, max_response_length, max_chunks, include_references, max_depth, verbose)
+        _ask_command_async(
+            config,
+            query,
+            max_response_length,
+            max_chunks,
+            include_references,
+            max_depth,
+            verbose,
+        )
     )
 
 

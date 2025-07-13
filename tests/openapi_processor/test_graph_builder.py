@@ -14,7 +14,12 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:components/schemas/Pet",
                 element_type="component",
-                content={"Pet": {"type": "object", "properties": {"name": {"type": "string"}}}},
+                content={
+                    "Pet": {
+                        "type": "object",
+                        "properties": {"name": {"type": "string"}},
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
@@ -129,13 +134,23 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:components/schemas/A",
                 element_type="component",
-                content={"A": {"type": "object", "properties": {"b": {"$ref": "#/components/schemas/B"}}}},
+                content={
+                    "A": {
+                        "type": "object",
+                        "properties": {"b": {"$ref": "#/components/schemas/B"}},
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/B",
                 element_type="component",
-                content={"B": {"type": "object", "properties": {"a": {"$ref": "#/components/schemas/A"}}}},
+                content={
+                    "B": {
+                        "type": "object",
+                        "properties": {"a": {"$ref": "#/components/schemas/A"}},
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
         ]

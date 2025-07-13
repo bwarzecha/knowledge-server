@@ -141,7 +141,13 @@ class TestVectorStoreIntegration:
             },
             {
                 "query": "schema data model definition",
-                "expected_terms": ["schema", "model", "definition", "properties", "component"],
+                "expected_terms": [
+                    "schema",
+                    "model",
+                    "definition",
+                    "properties",
+                    "component",
+                ],
             },
         ]
 
@@ -188,7 +194,11 @@ class TestVectorStoreIntegration:
         assert len(results) <= 10
 
         # Test retrieval of specific chunks from different batches
-        test_ids = [large_subset[0]["id"], large_subset[100]["id"], large_subset[-1]["id"]]
+        test_ids = [
+            large_subset[0]["id"],
+            large_subset[100]["id"],
+            large_subset[-1]["id"],
+        ]
         retrieved = vector_store.get_by_ids(test_ids)
         assert len(retrieved) == len(test_ids)
 

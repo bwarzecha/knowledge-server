@@ -71,7 +71,9 @@ class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
         return encode_documents(input, self.model, max_tokens=self.max_tokens)
 
 
-def create_chromadb_client(persist_directory: str = "./chromadb_data") -> chromadb.Client:
+def create_chromadb_client(
+    persist_directory: str = "./chromadb_data",
+) -> chromadb.Client:
     """
     Create ChromaDB client with persistent storage.
 
@@ -292,7 +294,11 @@ def get_collection_info(collection: chromadb.Collection) -> Dict[str, Any]:
     try:
         count = collection.count()
 
-        info = {"name": collection.name, "count": count, "metadata": collection.metadata}
+        info = {
+            "name": collection.name,
+            "count": count,
+            "metadata": collection.metadata,
+        }
 
         logger.info(f"Collection {collection.name} has {count} documents")
         return info

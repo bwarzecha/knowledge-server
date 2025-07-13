@@ -62,7 +62,10 @@ class GraphBuilder:
         return ref_ids
 
     def _get_dependencies(
-        self, chunk_id: str, element_lookup: Dict[str, ExtractedElement], visited: Set[str]
+        self,
+        chunk_id: str,
+        element_lookup: Dict[str, ExtractedElement],
+        visited: Set[str],
     ) -> List[str]:
         """Get all dependencies of a chunk (recursive with cycle detection)."""
         if chunk_id in visited or chunk_id not in element_lookup:

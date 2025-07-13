@@ -113,7 +113,10 @@ async def searchChunks(
 
 
 async def getChunks(
-    vector_store: VectorStoreManager, chunk_ids: List[str], expand_depth: int = 3, max_total_chunks: int = 100
+    vector_store: VectorStoreManager,
+    chunk_ids: List[str],
+    expand_depth: int = 3,
+    max_total_chunks: int = 100,
 ) -> RetrievalResults:
     """
     Retrieve multiple chunks by ID with controlled reference expansion.
@@ -130,7 +133,12 @@ async def getChunks(
     # Handle empty input
     if not chunk_ids:
         return RetrievalResults(
-            requested_chunks=[], expanded_chunks=[], total_chunks=0, total_tokens=0, expansion_stats={}, truncated=False
+            requested_chunks=[],
+            expanded_chunks=[],
+            total_chunks=0,
+            total_tokens=0,
+            expansion_stats={},
+            truncated=False,
         )
 
     # Get requested chunks by ID
@@ -289,4 +297,3 @@ def generate_api_context(api_index_path: str = "data/api_index.json") -> str:
 
     except Exception:
         return "Available API Files: (context unavailable)"
-

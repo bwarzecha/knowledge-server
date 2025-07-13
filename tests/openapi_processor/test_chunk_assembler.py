@@ -51,7 +51,12 @@ class TestChunkAssembler:
         element = ExtractedElement(
             element_id="api.json:paths/pets/get",
             element_type="operation",
-            content={"get": {"operationId": "listPets", "responses": {"200": {"description": "Success"}}}},
+            content={
+                "get": {
+                    "operationId": "listPets",
+                    "responses": {"200": {"description": "Success"}},
+                }
+            },
             metadata={
                 "type": "operation",
                 "source_file": "api.json",
@@ -89,7 +94,10 @@ class TestChunkAssembler:
             content={
                 "Pet": {
                     "type": "object",
-                    "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "name": {"type": "string"},
+                    },
                 }
             },
             metadata={
@@ -194,7 +202,10 @@ class TestChunkAssembler:
                 "ComplexSchema": {
                     "type": "object",
                     "properties": {
-                        "items": {"type": "array", "items": {"$ref": "#/components/schemas/Item"}},
+                        "items": {
+                            "type": "array",
+                            "items": {"$ref": "#/components/schemas/Item"},
+                        },
                         "metadata": {"type": "object", "additionalProperties": True},
                     },
                     "required": ["items"],

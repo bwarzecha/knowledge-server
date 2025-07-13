@@ -16,7 +16,10 @@ def create_research_agent():
 
     # Create Bedrock model
     model = ChatBedrockConverse(
-        model="us.anthropic.claude-3-5-haiku-20241022-v1:0", temperature=0.1, region_name="us-east-1", max_tokens=8192
+        model="us.anthropic.claude-3-5-haiku-20241022-v1:0",
+        temperature=0.1,
+        region_name="us-east-1",
+        max_tokens=8192,
     )
 
     # Generate API context for system prompt
@@ -82,4 +85,3 @@ async def research_api_question(question: str) -> str:
     logger.info(f"Research completed: {iterations} iterations, {tool_calls} tool calls, {len(messages)} total messages")
 
     return result["messages"][-1].content
-

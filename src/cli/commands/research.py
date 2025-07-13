@@ -48,4 +48,3 @@ def research_command(config: Config, question: str, verbose: bool = False) -> No
 
             traceback.print_exc()
         raise
-

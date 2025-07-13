@@ -74,7 +74,9 @@ class BedrockLLMProvider(LLMProvider):
             }
 
             response = self._client.invoke_model(
-                modelId=self.model_id, body=json.dumps(body), contentType="application/json"
+                modelId=self.model_id,
+                body=json.dumps(body),
+                contentType="application/json",
             )
 
             response_body = json.loads(response["body"].read())

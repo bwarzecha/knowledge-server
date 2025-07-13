@@ -134,7 +134,11 @@ class IndexBuilder:
 
         return " ".join(parts)
 
-    def save_index(self, file_entries: List[Dict[str, Any]], output_path: str = "data/api_index.json"):
+    def save_index(
+        self,
+        file_entries: List[Dict[str, Any]],
+        output_path: str = "data/api_index.json",
+    ):
         """Save text-based index to JSON file."""
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)

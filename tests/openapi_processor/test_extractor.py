@@ -69,7 +69,13 @@ class TestElementExtractor:
                         "summary": "Create a pet",
                     },
                 },
-                "/pets/{id}": {"get": {"operationId": "getPet", "tags": ["pets"], "summary": "Get a pet by ID"}},
+                "/pets/{id}": {
+                    "get": {
+                        "operationId": "getPet",
+                        "tags": ["pets"],
+                        "summary": "Get a pet by ID",
+                    }
+                },
             },
         }
 
@@ -107,14 +113,26 @@ class TestElementExtractor:
                 "schemas": {
                     "Pet": {
                         "type": "object",
-                        "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+                        "properties": {
+                            "id": {"type": "integer"},
+                            "name": {"type": "string"},
+                        },
                     },
                     "Error": {
                         "type": "object",
-                        "properties": {"code": {"type": "integer"}, "message": {"type": "string"}},
+                        "properties": {
+                            "code": {"type": "integer"},
+                            "message": {"type": "string"},
+                        },
                     },
                 },
-                "parameters": {"limitParam": {"name": "limit", "in": "query", "schema": {"type": "integer"}}},
+                "parameters": {
+                    "limitParam": {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {"type": "integer"},
+                    }
+                },
             },
         }
 
@@ -218,7 +236,10 @@ class TestElementExtractor:
 
     def test_extract_missing_info(self):
         """Test extraction when info section is missing."""
-        spec_data = {"openapi": "3.0.0", "paths": {"/test": {"get": {"operationId": "test"}}}}
+        spec_data = {
+            "openapi": "3.0.0",
+            "paths": {"/test": {"get": {"operationId": "test"}}},
+        }
 
         extractor = ElementExtractor()
         elements = extractor.extract_elements(spec_data, "no-info.json")

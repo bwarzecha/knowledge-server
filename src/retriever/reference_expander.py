@@ -17,7 +17,10 @@ class ReferenceExpander:
         self.vector_store = vector_store_manager
 
     def expand_references(
-        self, primary_chunks: List[Dict[str, Any]], max_depth: int = 3, max_total: int = 15
+        self,
+        primary_chunks: List[Dict[str, Any]],
+        max_depth: int = 3,
+        max_total: int = 15,
     ) -> Tuple[List[Dict[str, Any]], RetrievalStats]:
         """
         Expand references from primary chunks using breadth-first traversal.

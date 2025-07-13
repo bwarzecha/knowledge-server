@@ -93,7 +93,10 @@ class VectorStoreManager:
 
         # Create or get collection
         self.collection = create_collection(
-            self.client, self.collection_name, self.embedding_function, reset=self.reset_on_start
+            self.client,
+            self.collection_name,
+            self.embedding_function,
+            reset=self.reset_on_start,
         )
 
         logger.info("VectorStoreManager setup complete")
@@ -196,7 +199,12 @@ class VectorStoreManager:
         Returns:
             Health status information
         """
-        status = {"client": False, "embedding_model": False, "collection": False, "errors": []}
+        status = {
+            "client": False,
+            "embedding_model": False,
+            "collection": False,
+            "errors": [],
+        }
 
         try:
             # Check client
