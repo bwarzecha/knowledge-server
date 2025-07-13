@@ -2,11 +2,14 @@
 """Build API index for query expansion - one entry per file."""
 
 import json
+import logging
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
 import tiktoken
+
+logger = logging.getLogger(__name__)
 
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -131,9 +134,7 @@ class IndexBuilder:
 
         return " ".join(parts)
 
-    def save_index(
-        self, file_entries: List[Dict[str, Any]], output_path: str = "data/api_index.json"
-    ):
+    def save_index(self, file_entries: List[Dict[str, Any]], output_path: str = "data/api_index.json"):
         """Save text-based index to JSON file."""
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -154,9 +155,9 @@ class IndexBuilder:
         total_text = "\n\n".join(entry["text"] for entry in file_entries)
         tokens = len(self.tokenizer.encode(total_text))
 
-        print(f"✅ Index saved to {output_path}")
-        print(f"   Files: {len(file_entries)}")
-        print(f"   Total text: {len(total_text):,} chars, {tokens:,} tokens")
+        logger.info(f"✅ Index saved to {output_path}")
+        logger.info(f"   Files: {len(file_entries)}")
+        logger.info(f"   Total text: {len(total_text):,} chars, {tokens:,} tokens")
         return tokens
 
     def create_compact_text(self, file_entries: List[Dict[str, Any]], max_chars: int = 1200) -> str:
@@ -195,21 +196,21 @@ def main():
 
     # Build from samples directory
     directories = ["samples"]
-    print(f"🔄 Building text-based index from: {directories}")
+    logger.info(f"🔄 Building text-based index from: {directories}")
 
     file_entries = builder.build_index(directories)
     builder.save_index(file_entries)
 
     # Show sample entries
-    print("\n📄 Sample file entries (first 2):")
+    logger.info("\n📄 Sample file entries (first 2):")
     for entry in file_entries[:2]:
         lines = entry["text"].split("\n")
-        print(f"   {entry['file']}: {lines[0]} - {len(lines)} lines")
+        logger.info(f"   {entry['file']}: {lines[0]} - {len(lines)} lines")
 
     # Test compact representation
     compact = builder.create_compact_text(file_entries)
-    print(f"\n📊 Compact representation ({len(compact)} chars):")
-    print(compact[:500] + "..." if len(compact) > 500 else compact)
+    logger.info(f"\n📊 Compact representation ({len(compact)} chars):")
+    logger.info(compact[:500] + "..." if len(compact) > 500 else compact)
 
 
 if __name__ == "__main__":

@@ -54,9 +54,7 @@ class TestReferenceScanner:
                 {"$ref": "#/components/schemas/Base"},
                 {
                     "type": "object",
-                    "properties": {
-                        "items": {"type": "array", "items": {"$ref": "#/components/schemas/Item"}}
-                    },
+                    "properties": {"items": {"type": "array", "items": {"$ref": "#/components/schemas/Item"}}},
                 },
             ]
         }
@@ -69,9 +67,7 @@ class TestReferenceScanner:
 
     def test_find_references_in_arrays(self):
         """Test finding references in array structures."""
-        content = {
-            "oneOf": [{"$ref": "#/components/schemas/Dog"}, {"$ref": "#/components/schemas/Cat"}]
-        }
+        content = {"oneOf": [{"$ref": "#/components/schemas/Dog"}, {"$ref": "#/components/schemas/Cat"}]}
 
         scanner = ReferenceScanner()
         refs = scanner.find_references(content)

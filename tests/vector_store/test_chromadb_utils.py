@@ -163,9 +163,7 @@ class TestChromaDBUtils:
         add_chunks_to_collection(collection, sample_chunks)
 
         # Search for user-related content
-        results = search_collection(
-            collection, "user information and profile data", embedding_model, limit=3
-        )
+        results = search_collection(collection, "user information and profile data", embedding_model, limit=3)
 
         assert len(results) <= 3
         assert all("id" in result for result in results)

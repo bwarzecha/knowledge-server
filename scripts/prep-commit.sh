@@ -21,16 +21,12 @@ fi
 echo "📦 Activating virtual environment..."
 source venv/bin/activate
 
-echo "🎨 Formatting code..."
-echo "  - Running black..."
-black src/ tests/ --quiet
+echo "🎨 Formatting and linting code with ruff..."
+echo "  - Running ruff format..."
+ruff format src/ tests/
 
-echo "  - Running isort..."
-isort src/ tests/ --quiet
-
-echo "🔍 Checking code quality..."
-echo "  - Running flake8..."
-if ! flake8 src/ tests/ --max-line-length=120 --extend-ignore=E203,W503,F541; then
+echo "  - Running ruff check..."
+if ! ruff check src/ tests/ --fix; then
     echo "❌ Linting failed. Please fix issues above."
     exit 1
 fi

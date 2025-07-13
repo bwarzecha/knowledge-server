@@ -64,9 +64,7 @@ class TestVectorStoreIntegration:
         assert all("distance" in result for result in search_results)
 
         # Test filtered search
-        component_results = vector_store.search(
-            "schema definition", limit=3, filters={"type": "component"}
-        )
+        component_results = vector_store.search("schema definition", limit=3, filters={"type": "component"})
 
         # Verify all results are components (if any found)
         for result in component_results:

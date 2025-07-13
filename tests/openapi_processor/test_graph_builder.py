@@ -23,13 +23,7 @@ class TestGraphBuilder:
                 content={
                     "get": {
                         "responses": {
-                            "200": {
-                                "content": {
-                                    "application/json": {
-                                        "schema": {"$ref": "#/components/schemas/Pet"}
-                                    }
-                                }
-                            }
+                            "200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Pet"}}}}
                         }
                     }
                 },
@@ -99,11 +93,7 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:paths/people/get",
                 element_type="operation",
-                content={
-                    "get": {
-                        "responses": {"200": {"schema": {"$ref": "#/components/schemas/Person"}}}
-                    }
-                },
+                content={"get": {"responses": {"200": {"schema": {"$ref": "#/components/schemas/Person"}}}}},
                 metadata={"type": "operation", "source_file": "api.json"},
             ),
         ]
@@ -114,9 +104,7 @@ class TestGraphBuilder:
         # Expected graph structure
         expected_refs = {
             "api.json:paths/people/get": {
-                "ref_ids": {
-                    "api.json:components/schemas/Person": ["api.json:components/schemas/Address"]
-                },
+                "ref_ids": {"api.json:components/schemas/Person": ["api.json:components/schemas/Address"]},
                 "referenced_by": [],
             },
             "api.json:components/schemas/Person": {
@@ -141,17 +129,13 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:components/schemas/A",
                 element_type="component",
-                content={
-                    "A": {"type": "object", "properties": {"b": {"$ref": "#/components/schemas/B"}}}
-                },
+                content={"A": {"type": "object", "properties": {"b": {"$ref": "#/components/schemas/B"}}}},
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/B",
                 element_type="component",
-                content={
-                    "B": {"type": "object", "properties": {"a": {"$ref": "#/components/schemas/A"}}}
-                },
+                content={"B": {"type": "object", "properties": {"a": {"$ref": "#/components/schemas/A"}}}},
                 metadata={"type": "component", "source_file": "api.json"},
             ),
         ]
@@ -163,17 +147,13 @@ class TestGraphBuilder:
         expected_refs = {
             "api.json:components/schemas/A": {
                 "ref_ids": {
-                    "api.json:components/schemas/B": [
-                        "api.json:components/schemas/A"
-                    ]  # B has A as dependency
+                    "api.json:components/schemas/B": ["api.json:components/schemas/A"]  # B has A as dependency
                 },
                 "referenced_by": ["api.json:components/schemas/B"],
             },
             "api.json:components/schemas/B": {
                 "ref_ids": {
-                    "api.json:components/schemas/A": [
-                        "api.json:components/schemas/B"
-                    ]  # A has B as dependency
+                    "api.json:components/schemas/A": ["api.json:components/schemas/B"]  # A has B as dependency
                 },
                 "referenced_by": ["api.json:components/schemas/A"],
             },
@@ -196,35 +176,25 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:components/schemas/Address",
                 element_type="component",
-                content={
-                    "Address": {"properties": {"type": {"$ref": "#/components/schemas/BaseType"}}}
-                },
+                content={"Address": {"properties": {"type": {"$ref": "#/components/schemas/BaseType"}}}},
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/Person",
                 element_type="component",
-                content={
-                    "Person": {"properties": {"address": {"$ref": "#/components/schemas/Address"}}}
-                },
+                content={"Person": {"properties": {"address": {"$ref": "#/components/schemas/Address"}}}},
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/Company",
                 element_type="component",
-                content={
-                    "Company": {"properties": {"owner": {"$ref": "#/components/schemas/Person"}}}
-                },
+                content={"Company": {"properties": {"owner": {"$ref": "#/components/schemas/Person"}}}},
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:paths/companies/get",
                 element_type="operation",
-                content={
-                    "get": {
-                        "responses": {"200": {"schema": {"$ref": "#/components/schemas/Company"}}}
-                    }
-                },
+                content={"get": {"responses": {"200": {"schema": {"$ref": "#/components/schemas/Company"}}}}},
                 metadata={"type": "operation", "source_file": "api.json"},
             ),
         ]
@@ -252,13 +222,9 @@ class TestGraphBuilder:
                 }
             },
             "api.json:components/schemas/Person": {
-                "ref_ids": {
-                    "api.json:components/schemas/Address": ["api.json:components/schemas/BaseType"]
-                }
+                "ref_ids": {"api.json:components/schemas/Address": ["api.json:components/schemas/BaseType"]}
             },
-            "api.json:components/schemas/Address": {
-                "ref_ids": {"api.json:components/schemas/BaseType": []}
-            },
+            "api.json:components/schemas/Address": {"ref_ids": {"api.json:components/schemas/BaseType": []}},
             "api.json:components/schemas/BaseType": {"ref_ids": {}},
         }
 
@@ -283,17 +249,13 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:components/schemas/TypeA",
                 element_type="component",
-                content={
-                    "TypeA": {"properties": {"common": {"$ref": "#/components/schemas/Common"}}}
-                },
+                content={"TypeA": {"properties": {"common": {"$ref": "#/components/schemas/Common"}}}},
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/TypeB",
                 element_type="component",
-                content={
-                    "TypeB": {"properties": {"common": {"$ref": "#/components/schemas/Common"}}}
-                },
+                content={"TypeB": {"properties": {"common": {"$ref": "#/components/schemas/Common"}}}},
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
@@ -345,13 +307,7 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:paths/pets/get",
                 element_type="operation",
-                content={
-                    "get": {
-                        "responses": {
-                            "200": {"schema": {"$ref": "#/components/schemas/NonExistent"}}
-                        }
-                    }
-                },
+                content={"get": {"responses": {"200": {"schema": {"$ref": "#/components/schemas/NonExistent"}}}}},
                 metadata={"type": "operation", "source_file": "api.json"},
             )
         ]

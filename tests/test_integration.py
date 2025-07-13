@@ -94,9 +94,7 @@ class TestOpenAPIProcessorIntegration:
         processor = OpenAPIProcessor()
 
         # Test JSON files
-        json_chunks = processor.process_directory(
-            "open-api-small-samples/3.0/json/openapi-workshop"
-        )
+        json_chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
 
         # Test YAML files
         yaml_chunks = processor.process_directory("open-api-small-samples/3.0/yaml")

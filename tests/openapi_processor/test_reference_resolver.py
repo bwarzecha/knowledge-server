@@ -16,27 +16,21 @@ class TestReferenceResolver:
     def test_resolve_parameter_reference(self):
         """Test resolving parameter reference."""
         resolver = ReferenceResolver()
-        chunk_id = resolver.resolve_ref_to_chunk_id(
-            "#/components/parameters/limitParam", "petstore.yaml"
-        )
+        chunk_id = resolver.resolve_ref_to_chunk_id("#/components/parameters/limitParam", "petstore.yaml")
 
         assert chunk_id == "petstore.yaml:components/parameters/limitParam"
 
     def test_resolve_response_reference(self):
         """Test resolving response reference."""
         resolver = ReferenceResolver()
-        chunk_id = resolver.resolve_ref_to_chunk_id(
-            "#/components/responses/ErrorResponse", "apis/v1/openapi.json"
-        )
+        chunk_id = resolver.resolve_ref_to_chunk_id("#/components/responses/ErrorResponse", "apis/v1/openapi.json")
 
         assert chunk_id == "apis/v1/openapi.json:components/responses/ErrorResponse"
 
     def test_resolve_request_body_reference(self):
         """Test resolving request body reference."""
         resolver = ReferenceResolver()
-        chunk_id = resolver.resolve_ref_to_chunk_id(
-            "#/components/requestBodies/PetBody", "test.yaml"
-        )
+        chunk_id = resolver.resolve_ref_to_chunk_id("#/components/requestBodies/PetBody", "test.yaml")
 
         assert chunk_id == "test.yaml:components/requestBodies/PetBody"
 
@@ -57,9 +51,7 @@ class TestReferenceResolver:
     def test_resolve_deep_path_reference(self):
         """Test resolving reference with deep path."""
         resolver = ReferenceResolver()
-        chunk_id = resolver.resolve_ref_to_chunk_id(
-            "#/components/schemas/nested/deep/Component", "complex.json"
-        )
+        chunk_id = resolver.resolve_ref_to_chunk_id("#/components/schemas/nested/deep/Component", "complex.json")
 
         assert chunk_id == "complex.json:components/schemas/nested/deep/Component"
 

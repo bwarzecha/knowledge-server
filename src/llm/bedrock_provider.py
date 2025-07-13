@@ -1,8 +1,11 @@
 """AWS Bedrock LLM provider using boto3."""
 
 import json
+import logging
 
 from .provider import LLMProvider
+
+logger = logging.getLogger(__name__)
 
 
 class BedrockLLMProvider(LLMProvider):
@@ -39,13 +42,13 @@ class BedrockLLMProvider(LLMProvider):
                 self._available = True
 
         except ImportError:
-            print("Warning: boto3 not installed")
+            logger.warning("Warning: boto3 not installed")
             self._available = False
         except NoCredentialsError:
-            print("Warning: AWS credentials not configured")
+            logger.warning("Warning: AWS credentials not configured")
             self._available = False
         except Exception as e:
-            print(f"Warning: Failed to initialize Bedrock: {e}")
+            logger.warning(f"Warning: Failed to initialize Bedrock: {e}")
             self._available = False
 
     def is_available(self) -> bool:

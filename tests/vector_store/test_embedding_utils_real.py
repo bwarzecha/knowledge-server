@@ -86,18 +86,14 @@ class TestEmbeddingUtilsReal:
 
         # Cosine similarity between cat and dog should be higher than cat and programming
         cat_dog_sim = np.dot(cat_emb, dog_emb) / (np.linalg.norm(cat_emb) * np.linalg.norm(dog_emb))
-        cat_prog_sim = np.dot(cat_emb, prog_emb) / (
-            np.linalg.norm(cat_emb) * np.linalg.norm(prog_emb)
-        )
+        cat_prog_sim = np.dot(cat_emb, prog_emb) / (np.linalg.norm(cat_emb) * np.linalg.norm(prog_emb))
 
         assert cat_dog_sim > cat_prog_sim
 
     def test_encode_documents_with_token_limit(self, embedding_model):
         """Test document encoding with token limiting."""
         # Create a long document that exceeds token limit
-        long_text = (
-            "This is a repeated sentence about machine learning and artificial intelligence. " * 20
-        )
+        long_text = "This is a repeated sentence about machine learning and artificial intelligence. " * 20
         texts = [long_text]
 
         # Encode with token limit

@@ -31,15 +31,18 @@
 # Activate environment
 source venv/bin/activate
 
-# Format code
-black src/ tests/
-isort src/ tests/
-
-# Check linting (should pass with max-line-length=100)
-flake8 src/ tests/
+# Auto-format and fix linting issues with ruff
+ruff format src/ tests/
+ruff check src/ tests/ --fix
 
 # Run tests (all should pass)
 python -m pytest tests/ -v
+```
+
+**Quick autofix command:**
+```bash
+# One-liner to format and fix most issues automatically
+source venv/bin/activate && ruff format src/ tests/ && ruff check src/ tests/ --fix
 ```
 
 ### 2. Repository Cleanup 🧹
@@ -198,9 +201,16 @@ git rev-list --objects --all | \
 ## Automation Ideas
 
 Consider creating git hooks:
-- **pre-commit**: Auto-format with black/isort
+- **pre-commit**: Auto-format with ruff format/check
 - **pre-push**: Run test suite  
 - **commit-msg**: Validate commit message format
+
+**Automated prep script available:**
+```bash
+# Use the provided script for complete preparation
+./scripts/prep-commit.sh
+```
+This script automatically runs ruff formatting, linting with fixes, tests, and repository checks.
 
 ## Summary
 

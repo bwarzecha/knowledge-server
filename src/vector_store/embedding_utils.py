@@ -52,16 +52,12 @@ def get_token_count(text: str, encoding_name: str = "cl100k_base") -> int:
         encoding = tiktoken.get_encoding(encoding_name)
         return len(encoding.encode(text))
     except Exception as e:
-        logger.warning(
-            f"Failed to get token count with tiktoken: {e}. Using character approximation."
-        )
+        logger.warning(f"Failed to get token count with tiktoken: {e}. Using character approximation.")
         # Fallback to character approximation
         return len(text) // 4
 
 
-def trim_text_to_token_limit(
-    text: str, max_tokens: int = 512, encoding_name: str = "cl100k_base"
-) -> str:
+def trim_text_to_token_limit(text: str, max_tokens: int = 512, encoding_name: str = "cl100k_base") -> str:
     """
     Trim text to exact token limit using tiktoken.
 
@@ -109,9 +105,7 @@ def trim_text_to_token_limit(
             return text
 
         trimmed = text[: max_chars - 3] + "..."
-        logger.warning(
-            f"Text trimmed from {len(text)} to {len(trimmed)} characters (token limit: {max_tokens})"
-        )
+        logger.warning(f"Text trimmed from {len(text)} to {len(trimmed)} characters (token limit: {max_tokens})")
         return trimmed
 
 
@@ -139,9 +133,7 @@ def encode_documents(
     # Trim texts if token limit specified
     processed_texts = texts
     if max_tokens:
-        processed_texts = [
-            trim_text_to_token_limit(text, max_tokens, encoding_name) for text in texts
-        ]
+        processed_texts = [trim_text_to_token_limit(text, max_tokens, encoding_name) for text in texts]
 
     try:
         # Generate embeddings for documents
@@ -190,7 +182,7 @@ def encode_query(
         if "arctic-embed" in model_name:
             query_prefix = "Represent this sentence for searching relevant passages: "
             processed_query = query_prefix + processed_query
-            logger.debug(f"Using Arctic-Embed query prefix")
+            logger.debug("Using Arctic-Embed query prefix")
 
         # For Stella models, use s2p_query prompt for sentence-to-passage search
         elif "stella" in model_name:
@@ -198,9 +190,7 @@ def encode_query(
                 embedding = model.encode([processed_query], prompt_name="s2p_query")[0]
                 return embedding.tolist()
             except (TypeError, AttributeError, KeyError) as e:
-                logger.warning(
-                    f"Failed to use s2p_query prompt for Stella model: {e}. Using default encoding."
-                )
+                logger.warning(f"Failed to use s2p_query prompt for Stella model: {e}. Using default encoding.")
 
         # For Qwen3 models, use query prompt for better search performance
         elif "qwen" in model_name:
@@ -208,9 +198,7 @@ def encode_query(
                 embedding = model.encode([processed_query], prompt_name="query")[0]
                 return embedding.tolist()
             except (TypeError, AttributeError, KeyError) as e:
-                logger.warning(
-                    f"Failed to use query prompt for Qwen model: {e}. Using default encoding."
-                )
+                logger.warning(f"Failed to use query prompt for Qwen model: {e}. Using default encoding.")
 
         # Standard encoding without prompt (fallback for all models)
         embedding = model.encode([processed_query])[0]
@@ -221,9 +209,7 @@ def encode_query(
         raise
 
 
-def validate_embedding_dimensions(
-    embeddings: List[List[float]], expected_dim: Optional[int] = None
-) -> bool:
+def validate_embedding_dimensions(embeddings: List[List[float]], expected_dim: Optional[int] = None) -> bool:
     """
     Validate that embeddings have consistent dimensions.
 

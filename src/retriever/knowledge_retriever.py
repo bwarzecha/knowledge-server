@@ -69,8 +69,7 @@ class KnowledgeRetriever:
         depth_limit = max_depth or self.config.max_depth
 
         logger.info(
-            f"Starting retrieval for query: '{query}' "
-            f"(primary_limit={primary_limit}, total_limit={total_limit})"
+            f"Starting retrieval for query: '{query}' (primary_limit={primary_limit}, total_limit={total_limit})"
         )
 
         # Stage 1: Semantic Search
@@ -130,9 +129,7 @@ class KnowledgeRetriever:
 
         return context
 
-    def _execute_semantic_search(
-        self, query: str, limit: int, filters: Optional[Dict[str, Any]]
-    ) -> list:
+    def _execute_semantic_search(self, query: str, limit: int, filters: Optional[Dict[str, Any]]) -> list:
         """Execute semantic search using Vector Store Manager."""
         try:
             results = self.vector_store.search(query=query, limit=limit, filters=filters)

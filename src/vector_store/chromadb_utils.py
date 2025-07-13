@@ -127,9 +127,7 @@ def create_collection(
 
         if collection_exists:
             logger.info(f"Using existing collection: {collection_name}")
-            collection = client.get_collection(
-                name=collection_name, embedding_function=embedding_function
-            )
+            collection = client.get_collection(name=collection_name, embedding_function=embedding_function)
         else:
             logger.info(f"Creating new collection: {collection_name}")
             collection = client.create_collection(
@@ -176,12 +174,10 @@ def add_chunks_to_collection(
 
             batch_num = i // batch_size + 1
             total_batches = (len(chunks) + batch_size - 1) // batch_size
-            logger.info(
-                f"Added batch {batch_num}/{total_batches}: chunks {i+1}-{min(i+batch_size, len(chunks))}"
-            )
+            logger.info(f"Added batch {batch_num}/{total_batches}: chunks {i + 1}-{min(i + batch_size, len(chunks))}")
 
         except Exception as e:
-            logger.error(f"Failed to add batch {i//batch_size + 1}: {e}")
+            logger.error(f"Failed to add batch {i // batch_size + 1}: {e}")
             raise
 
 

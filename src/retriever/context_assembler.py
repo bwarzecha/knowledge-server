@@ -40,14 +40,10 @@ class ContextAssembler:
         # Convert raw chunks to Chunk objects
         primary_chunk_objects = self._convert_to_chunk_objects(primary_chunks, "primary_result")
 
-        referenced_chunk_objects = self._convert_to_chunk_objects(
-            referenced_chunks, "referenced_dependency"
-        )
+        referenced_chunk_objects = self._convert_to_chunk_objects(referenced_chunks, "referenced_dependency")
 
         # Apply context size limits if needed
-        primary_final, referenced_final = self._apply_size_limits(
-            primary_chunk_objects, referenced_chunk_objects
-        )
+        primary_final, referenced_final = self._apply_size_limits(primary_chunk_objects, referenced_chunk_objects)
 
         # Calculate total token count
         total_tokens = self._estimate_total_tokens(primary_final + referenced_final)
@@ -79,9 +75,7 @@ class ContextAssembler:
 
         return context
 
-    def _convert_to_chunk_objects(
-        self, raw_chunks: List[Dict[str, Any]], retrieval_reason: str
-    ) -> List[Chunk]:
+    def _convert_to_chunk_objects(self, raw_chunks: List[Dict[str, Any]], retrieval_reason: str) -> List[Chunk]:
         """Convert raw chunks to Chunk objects with relevance scores."""
         chunk_objects = []
 

@@ -2,9 +2,12 @@
 """Query expander using LLM with API index."""
 
 import json
+import logging
 from typing import Any, Dict
 
 from src.llm.provider import create_llm_client
+
+logger = logging.getLogger(__name__)
 
 
 class QueryExpander:
@@ -26,13 +29,13 @@ class QueryExpander:
         try:
             self.llm = create_llm_client(llm_provider, **llm_config)
         except Exception as e:
-            print(f"Warning: Failed to create LLM client: {e}")
+            logger.warning(f"Warning: Failed to create LLM client: {e}")
             self.llm = None
 
     def expand_query(self, query: str) -> str:
         """Expand query using LLM and API index."""
         if not self.llm or not self.llm.is_available():
-            print("LLM not available, returning original query")
+            logger.warning("LLM not available, returning original query")
             return query
 
         try:
@@ -52,7 +55,7 @@ class QueryExpander:
             return merged if merged.strip() else query
 
         except Exception as e:
-            print(f"Query expansion failed: {e}")
+            logger.warning(f"Query expansion failed: {e}")
             return query
 
     def _load_index(self) -> Dict[str, Any]:
@@ -62,7 +65,7 @@ class QueryExpander:
                 with open(self.index_path, "r") as f:
                     self._index_cache = json.load(f)
             except Exception as e:
-                print(f"Failed to load index: {e}")
+                logger.warning(f"Failed to load index: {e}")
                 self._index_cache = {"entries": []}
         return self._index_cache
 

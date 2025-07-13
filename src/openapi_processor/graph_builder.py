@@ -75,22 +75,16 @@ class GraphBuilder:
         refs = self.scanner.find_references(element.content)
 
         for ref in refs:
-            dep_chunk_id = self.resolver.resolve_ref_to_chunk_id(
-                ref, element.metadata["source_file"]
-            )
+            dep_chunk_id = self.resolver.resolve_ref_to_chunk_id(ref, element.metadata["source_file"])
             if dep_chunk_id and dep_chunk_id in element_lookup and dep_chunk_id not in visited:
                 dependencies.append(dep_chunk_id)
                 # Add transitive dependencies
-                transitive_deps = self._get_dependencies(
-                    dep_chunk_id, element_lookup, visited.copy()
-                )
+                transitive_deps = self._get_dependencies(dep_chunk_id, element_lookup, visited.copy())
                 dependencies.extend(transitive_deps)
 
         return list(set(dependencies))  # Remove duplicates
 
-    def _populate_referenced_by(
-        self, element: ExtractedElement, element_lookup: Dict[str, ExtractedElement]
-    ) -> None:
+    def _populate_referenced_by(self, element: ExtractedElement, element_lookup: Dict[str, ExtractedElement]) -> None:
         """Populate referenced_by lists based on ref_ids."""
         ref_ids = element.metadata.get("ref_ids", {})
 

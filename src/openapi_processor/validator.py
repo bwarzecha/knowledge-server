@@ -34,8 +34,7 @@ class ValidatorConfig:
         return cls(
             min_openapi_version=os.getenv("MIN_OPENAPI_VERSION", "3.0.0"),
             require_info_section=os.getenv("REQUIRE_INFO_SECTION", "true").lower() == "true",
-            require_paths_or_components=os.getenv("REQUIRE_PATHS_OR_COMPONENTS", "true").lower()
-            == "true",
+            require_paths_or_components=os.getenv("REQUIRE_PATHS_OR_COMPONENTS", "true").lower() == "true",
         )
 
 
@@ -59,9 +58,7 @@ class OpenAPIValidator:
             return ValidationResult(is_valid=False, errors=["Specification data is None"])
 
         if not isinstance(spec_data, dict):
-            return ValidationResult(
-                is_valid=False, errors=["Specification data must be a dictionary"]
-            )
+            return ValidationResult(is_valid=False, errors=["Specification data must be a dictionary"])
 
         errors = []
         warnings = []
@@ -102,8 +99,7 @@ class OpenAPIValidator:
         # Simple version comparison for OpenAPI versions (e.g., "3.0.0", "3.1.0")
         if not self._is_version_supported(openapi_version):
             return (
-                f"OpenAPI version {openapi_version} is below minimum required "
-                f"version {self.config.min_openapi_version}"
+                f"OpenAPI version {openapi_version} is below minimum required version {self.config.min_openapi_version}"
             )
 
         return None

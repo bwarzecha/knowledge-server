@@ -83,9 +83,7 @@ class ChunkAssembler:
     def _convert_to_yaml(self, content: Any) -> str:
         """Convert content to YAML format."""
         try:
-            return yaml.dump(
-                content, default_flow_style=False, sort_keys=False, allow_unicode=True
-            ).strip()
+            return yaml.dump(content, default_flow_style=False, sort_keys=False, allow_unicode=True).strip()
         except Exception:
             # Fallback for content that can't be serialized
             return str(content)

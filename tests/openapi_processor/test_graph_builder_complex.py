@@ -186,11 +186,7 @@ class TestGraphBuilderComplex:
             },
             {
                 "id": "test.json:schemas/A",
-                "content": {
-                    "A": {
-                        "properties": {"b": {"$ref": "#/schemas/B"}, "c": {"$ref": "#/schemas/C"}}
-                    }
-                },
+                "content": {"A": {"properties": {"b": {"$ref": "#/schemas/B"}, "c": {"$ref": "#/schemas/C"}}}},
                 "metadata": {"type": "component", "source_file": "test.json"},
             },
         ]
@@ -242,12 +238,8 @@ class TestGraphBuilderComplex:
             }
 
         # Verify the diamond pattern
-        assert (
-            actual["test.json:schemas/A"]["ref_ids"] == expected["test.json:schemas/A"]["ref_ids"]
-        )
-        assert actual["test.json:schemas/D"]["referenced_by"] == set(
-            expected["test.json:schemas/D"]["referenced_by"]
-        )
+        assert actual["test.json:schemas/A"]["ref_ids"] == expected["test.json:schemas/A"]["ref_ids"]
+        assert actual["test.json:schemas/D"]["referenced_by"] == set(expected["test.json:schemas/D"]["referenced_by"])
 
     def test_deep_linear_chain(self):
         """Test deep linear dependency chain: A -> B -> C -> D -> E."""
@@ -287,9 +279,7 @@ class TestGraphBuilderComplex:
                     ]
                 }
             },
-            "test.json:schemas/B": {
-                "ref_ids": {"test.json:schemas/C": ["test.json:schemas/D", "test.json:schemas/E"]}
-            },
+            "test.json:schemas/B": {"ref_ids": {"test.json:schemas/C": ["test.json:schemas/D", "test.json:schemas/E"]}},
             "test.json:schemas/C": {"ref_ids": {"test.json:schemas/D": ["test.json:schemas/E"]}},
             "test.json:schemas/D": {"ref_ids": {"test.json:schemas/E": []}},
             "test.json:schemas/E": {"ref_ids": {}},

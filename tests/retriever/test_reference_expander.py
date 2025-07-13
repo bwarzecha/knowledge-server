@@ -145,9 +145,7 @@ class TestReferenceExpander:
 
     def test_empty_primary_chunks(self, reference_expander):
         """Test expansion with empty primary chunks list."""
-        referenced_chunks, stats = reference_expander.expand_references(
-            primary_chunks=[], max_depth=3, max_total=10
-        )
+        referenced_chunks, stats = reference_expander.expand_references(primary_chunks=[], max_depth=3, max_total=10)
 
         assert referenced_chunks == []
         assert stats.primary_count == 0
@@ -158,9 +156,7 @@ class TestReferenceExpander:
     def test_chunks_without_references(self, reference_expander, real_chunks):
         """Test expansion with chunks that have no references."""
         # Find chunks without references
-        chunks_without_refs = [
-            chunk for chunk in real_chunks if not chunk["metadata"].get("ref_ids")
-        ]
+        chunks_without_refs = [chunk for chunk in real_chunks if not chunk["metadata"].get("ref_ids")]
 
         if not chunks_without_refs:
             pytest.skip("All chunks have references")

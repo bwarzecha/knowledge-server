@@ -1,6 +1,10 @@
 """Local LLM provider using llama-cpp-python."""
 
+import logging
+
 from .provider import LLMProvider
+
+logger = logging.getLogger(__name__)
 
 
 class LocalLLMProvider(LLMProvider):
@@ -26,18 +30,18 @@ class LocalLLMProvider(LLMProvider):
         try:
             from llama_cpp import Llama
 
-            print(f"Loading model from {self.repo_id}/{self.filename}...")
+            logger.info(f"Loading model from {self.repo_id}/{self.filename}...")
             self._llm = Llama.from_pretrained(
                 repo_id=self.repo_id, filename=self.filename, n_ctx=self.n_ctx, verbose=False
             )
             self._available = True
-            print("✅ Model loaded successfully")
+            logger.info("✅ Model loaded successfully")
 
         except ImportError:
-            print("Warning: llama-cpp-python not installed")
+            logger.info("Warning: llama-cpp-python not installed")
             self._available = False
         except Exception as e:
-            print(f"Warning: Failed to load model: {e}")
+            logger.info(f"Warning: Failed to load model: {e}")
             self._available = False
 
     def is_available(self) -> bool:

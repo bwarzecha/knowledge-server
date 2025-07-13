@@ -51,9 +51,7 @@ class TestChunkAssembler:
         element = ExtractedElement(
             element_id="api.json:paths/pets/get",
             element_type="operation",
-            content={
-                "get": {"operationId": "listPets", "responses": {"200": {"description": "Success"}}}
-            },
+            content={"get": {"operationId": "listPets", "responses": {"200": {"description": "Success"}}}},
             metadata={
                 "type": "operation",
                 "source_file": "api.json",
@@ -140,9 +138,7 @@ class TestChunkAssembler:
                 "path": "/pets",
                 "method": "post",
                 "ref_ids": {
-                    "api.json:components/requestBodies/PetBody": [
-                        "api.json:components/schemas/Pet"
-                    ],
+                    "api.json:components/requestBodies/PetBody": ["api.json:components/schemas/Pet"],
                     "api.json:components/responses/PetResponse": [],
                     "api.json:components/responses/ErrorResponse": [],
                 },

@@ -60,9 +60,7 @@ class ElementExtractor:
 
         metadata = {"type": "info", "source_file": spec_name, "natural_name": "info"}
 
-        return ExtractedElement(
-            element_id=element_id, element_type="info", content=content, metadata=metadata
-        )
+        return ExtractedElement(element_id=element_id, element_type="info", content=content, metadata=metadata)
 
     def _extract_tags(self, spec: Dict[str, Any], spec_name: str) -> Optional[ExtractedElement]:
         """Extract the tags section."""
@@ -74,9 +72,7 @@ class ElementExtractor:
 
         metadata = {"type": "tags", "source_file": spec_name, "natural_name": "tags"}
 
-        return ExtractedElement(
-            element_id=element_id, element_type="tags", content=content, metadata=metadata
-        )
+        return ExtractedElement(element_id=element_id, element_type="tags", content=content, metadata=metadata)
 
     def _extract_operations(self, spec: Dict[str, Any], spec_name: str) -> List[ExtractedElement]:
         """Extract operations from the paths section."""
@@ -98,9 +94,7 @@ class ElementExtractor:
 
             for method in http_methods:
                 if method in path_item:
-                    operation = self._extract_single_operation(
-                        path, method, path_item[method], spec_name
-                    )
+                    operation = self._extract_single_operation(path, method, path_item[method], spec_name)
                     if operation:
                         operations.append(operation)
 
@@ -133,9 +127,7 @@ class ElementExtractor:
             "tags": tags if isinstance(tags, list) else [],
         }
 
-        return ExtractedElement(
-            element_id=element_id, element_type="operation", content=content, metadata=metadata
-        )
+        return ExtractedElement(element_id=element_id, element_type="operation", content=content, metadata=metadata)
 
     def _extract_components(self, spec: Dict[str, Any], spec_name: str) -> List[ExtractedElement]:
         """Extract components from the components section."""
@@ -154,9 +146,7 @@ class ElementExtractor:
                 continue
 
             for component_name, component_data in component_items.items():
-                component = self._extract_single_component(
-                    component_type, component_name, component_data, spec_name
-                )
+                component = self._extract_single_component(component_type, component_name, component_data, spec_name)
                 if component:
                     components.append(component)
 
@@ -180,6 +170,4 @@ class ElementExtractor:
             "component_name": component_name,
         }
 
-        return ExtractedElement(
-            element_id=element_id, element_type="component", content=content, metadata=metadata
-        )
+        return ExtractedElement(element_id=element_id, element_type="component", content=content, metadata=metadata)

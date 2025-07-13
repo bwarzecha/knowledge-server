@@ -68,9 +68,7 @@ class VectorStoreManager:
         return cls(
             persist_directory=os.getenv("CHROMADB_PERSIST_DIR", "./chromadb_data"),
             collection_name=os.getenv("CHROMA_COLLECTION_NAME", "api_knowledge"),
-            embedding_model_name=os.getenv(
-                "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
-            ),
+            embedding_model_name=os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"),
             embedding_device=os.getenv("EMBEDDING_DEVICE", "mps"),
             max_tokens=int(os.getenv("MAX_EMBEDDING_TOKENS", "256")),
             reset_on_start=os.getenv("CHROMA_RESET_ON_START", "false").lower() == "true",
@@ -88,14 +86,10 @@ class VectorStoreManager:
 
         # Load embedding model
         logger.info(f"Loading embedding model: {self.embedding_model_name}")
-        self.embedding_model = load_embedding_model(
-            self.embedding_model_name, device=self.embedding_device
-        )
+        self.embedding_model = load_embedding_model(self.embedding_model_name, device=self.embedding_device)
 
         # Create embedding function
-        self.embedding_function = SentenceTransformerEmbeddingFunction(
-            self.embedding_model, max_tokens=self.max_tokens
-        )
+        self.embedding_function = SentenceTransformerEmbeddingFunction(self.embedding_model, max_tokens=self.max_tokens)
 
         # Create or get collection
         self.collection = create_collection(
@@ -122,9 +116,7 @@ class VectorStoreManager:
         info = self.get_info()
         logger.info(f"Vector store now contains {info['count']} documents")
 
-    def search(
-        self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+    def search(self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         Search the vector store using semantic similarity.
 
@@ -193,9 +185,7 @@ class VectorStoreManager:
         logger.warning(f"Clearing collection {self.collection_name}")
 
         # Delete and recreate collection
-        self.collection = create_collection(
-            self.client, self.collection_name, self.embedding_function, reset=True
-        )
+        self.collection = create_collection(self.client, self.collection_name, self.embedding_function, reset=True)
 
         logger.info("Collection cleared")
 
