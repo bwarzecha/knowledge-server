@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "knowledge-server"
+version = "0.1.0"
+description = "A specialized MCP server that makes large OpenAPI specifications accessible to LLMs through intelligent chunking and retrieval"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Knowledge Server Team"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "PyYAML>=6.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pytest>=7.0.0",
+    "tiktoken>=0.5.0",
+    "sentence-transformers>=2.2.0",
+    "chromadb>=0.4.0",
+    "boto3>=1.39.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black",
+    "isort",
+    "flake8",
+]
+
+[project.scripts]
+knowledge-server = "knowledge_server.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/your-org/knowledge-server"
+Repository = "https://github.com/your-org/knowledge-server"
+Issues = "https://github.com/your-org/knowledge-server/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.black]
+line-length = 100
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]

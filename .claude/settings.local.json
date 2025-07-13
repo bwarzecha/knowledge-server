@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source:*)",
+      "Bash(python:*)",
+      "Bash(jq:*)",
+      "Bash(yq:*)"
+    ],
+    "deny": []
+  }
+}
