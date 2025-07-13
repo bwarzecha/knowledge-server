@@ -1,10 +1,10 @@
-"""askAPI tool implementation for MCP server."""
+"""searchAPI tool implementation for MCP server."""
 
 from .response_assembler import ResponseAssembler
 from .shared_resources import get_shared_resources
 
 
-async def askAPI(
+async def searchAPI(
     query: str,
     max_response_length: int = 4000,
     max_chunks: int = 50,
@@ -12,17 +12,17 @@ async def askAPI(
     max_depth: int = 3,
 ) -> str:
     """
-    Ask questions about API documentation and get comprehensive answers.
+    Search API documentation and return relevant chunks.
 
     Args:
-        query: Natural language question about API usage, endpoints, schemas, or examples
+        query: Natural language search query for API documentation
         max_response_length: Maximum response length in tokens (for LLM context window)
         max_chunks: Maximum number of chunks to retrieve from knowledge base
         include_references: Whether to follow references between chunks
         max_depth: Maximum depth for reference expansion
 
     Returns:
-        Formatted response trimmed to fit within max_response_length
+        Formatted chunks trimmed to fit within max_response_length
     """
     try:
         # Get shared resources (pre-built indices)

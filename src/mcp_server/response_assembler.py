@@ -133,7 +133,8 @@ class ResponseAssembler:
         if hasattr(chunk, "relevance_score") and chunk.relevance_score is not None:
             chunk_info += f" [relevance: {chunk.relevance_score:.2f}]"
 
-        return f"{chunk_info}\n   {chunk.document[:200]}..."
+        # Show more content, let the main assembly logic handle truncation
+        return f"{chunk_info}\n{chunk.document}"
 
     def _build_footer(self, context: KnowledgeContext) -> str:
         """Build response footer with metadata."""

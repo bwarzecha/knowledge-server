@@ -1,4 +1,4 @@
-"""Ask command - test askAPI functionality from command line."""
+"""Ask command - test searchAPI functionality from command line."""
 
 import asyncio
 import logging
@@ -10,7 +10,7 @@ project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.cli.config import Config
-from src.mcp_server.askAPI import askAPI
+from src.mcp_server.searchAPI import searchAPI
 from src.mcp_server.shared_resources import initialize_shared_resources
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def ask_command(
     max_depth: int = 3,
     verbose: bool = False,
 ):
-    """Ask questions about API documentation using the askAPI functionality."""
+    """Ask questions about API documentation using the searchAPI functionality."""
     asyncio.run(
         _ask_command_async(config, query, max_response_length, max_chunks, include_references, max_depth, verbose)
     )
@@ -74,9 +74,9 @@ async def _ask_command_async(
         logger.error(f"❌ Failed to initialize resources: {e}")
         sys.exit(1)
 
-    # Call askAPI with the provided parameters
+    # Call searchAPI with the provided parameters
     try:
-        response = await askAPI(
+        response = await searchAPI(
             query=query,
             max_response_length=max_response_length,
             max_chunks=max_chunks,

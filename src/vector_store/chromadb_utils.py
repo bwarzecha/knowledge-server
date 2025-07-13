@@ -315,7 +315,11 @@ def _build_where_clause(filters: Dict[str, Any]) -> Dict[str, Any]:
     where_clause = {}
 
     for key, value in filters.items():
-        # Simple equality filters for now
-        where_clause[key] = {"$eq": value}
+        if isinstance(value, dict):
+            # Complex operator (e.g., {"$in": ["file1", "file2"]})
+            where_clause[key] = value
+        else:
+            # Simple equality filter
+            where_clause[key] = {"$eq": value}
 
     return where_clause

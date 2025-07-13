@@ -107,3 +107,6 @@ chromadb/
 prototypes/models/
 prototypes/*.json
 prototypes/*.jsonllocal/
+
+# Local
+local/

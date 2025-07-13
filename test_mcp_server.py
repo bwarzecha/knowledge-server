@@ -2,11 +2,11 @@
 """Test script for MCP server functionality."""
 
 import asyncio
-from src.mcp_server.askAPI import askAPI
+from src.mcp_server.searchAPI import searchAPI
 
-async def test_askAPI():
-    """Test the askAPI function directly."""
-    print("Testing askAPI function...")
+async def test_searchAPI():
+    """Test the searchAPI function directly."""
+    print("Testing searchAPI function...")
     
     test_queries = [
         "how to create a user",
@@ -16,9 +16,9 @@ async def test_askAPI():
     
     for query in test_queries:
         print(f"\nQuery: {query}")
-        result = await askAPI(query)
+        result = await searchAPI(query)
         print(f"Response: {result[:200]}...")
         print("=" * 50)
 
 if __name__ == "__main__":
-    asyncio.run(test_askAPI())
+    asyncio.run(test_searchAPI())

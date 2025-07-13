@@ -2,7 +2,16 @@ PyYAML>=6.0
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 pytest>=7.0.0
+pytest-asyncio>=1.0.0
 tiktoken>=0.5.0
 sentence-transformers>=2.2.0
 chromadb>=0.4.0
 boto3>=1.39.0
+
+# LangGraph and LangChain packages for Research Agent
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+langchain-aws>=0.2.0
+llama-cpp-python>=0.2.0

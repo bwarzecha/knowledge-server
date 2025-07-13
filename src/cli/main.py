@@ -10,6 +10,7 @@ sys.path.insert(0, str(project_root))
 
 from src.cli.commands.ask import ask_command
 from src.cli.commands.index import index_command
+from src.cli.commands.research import research_command
 from src.cli.commands.serve import serve_command
 from src.cli.config import Config
 from src.utils.logging_config import setup_logging
@@ -56,6 +57,12 @@ def main():
     ask_parser.add_argument("--config", help="Path to .env configuration file", default=None)
     ask_parser.add_argument("-v", "--verbose", action="store_true", help="Show detailed processing information")
 
+    # Research command
+    research_parser = subparsers.add_parser("research", help="Research questions using intelligent ReAct agent")
+    research_parser.add_argument("question", help="Research question about API documentation")
+    research_parser.add_argument("--config", help="Path to .env configuration file", default=None)
+    research_parser.add_argument("-v", "--verbose", action="store_true", help="Show detailed processing information")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -86,6 +93,12 @@ def main():
             max_chunks=args.max_chunks,
             include_references=not args.no_references,
             max_depth=args.max_depth,
+            verbose=verbose,
+        )
+    elif args.command == "research":
+        research_command(
+            config=config,
+            question=args.question,
             verbose=verbose,
         )
     else:

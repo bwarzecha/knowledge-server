@@ -23,6 +23,8 @@
 - **Database files**: ChromaDB persistence, `*.db`, `*.sqlite`
 - **Log files**: `*.log`, `logs/`
 - **Temporary files**: `.cache/`, `.pytest_cache/`, `*.tmp`
+- **Local files**: `loca/`
+
 
 ## Pre-Commit Checklist
 

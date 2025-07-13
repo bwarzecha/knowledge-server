@@ -5,7 +5,8 @@ from mcp.server.fastmcp import FastMCP
 from src.cli.config import Config
 from src.utils.logging_config import setup_logging
 
-from .askAPI import askAPI
+from ..research_agent import research_api_question
+from .searchAPI import searchAPI
 from .shared_resources import initialize_shared_resources
 
 # Setup logging for MCP (silent mode - ERROR level only)
@@ -15,9 +16,9 @@ setup_logging(verbose=False)
 mcp = FastMCP("Knowledge Server")
 
 
-# Register the askAPI tool
+# Register the searchAPI tool
 @mcp.tool()
-async def ask_api(
+async def search_api(
     query: str,
     max_response_length: int = 4000,
     max_chunks: int = 50,
@@ -25,25 +26,42 @@ async def ask_api(
     max_depth: int = 3,
 ) -> str:
     """
-    Ask questions about API documentation and get comprehensive answers.
+    Search API documentation and return relevant chunks.
 
     Args:
-        query: Natural language question about API usage, endpoints, schemas, or examples
+        query: Natural language search query for API documentation
         max_response_length: Maximum response length in tokens (for LLM context window)
         max_chunks: Maximum number of chunks to retrieve from knowledge base
         include_references: Whether to follow references between chunks for complete context
         max_depth: Maximum depth for reference expansion (1-5, default 3)
 
     Returns:
-        Formatted response with relevant API documentation, trimmed to fit within token limit
+        Formatted chunks with relevant API documentation, trimmed to fit within token limit
     """
-    return await askAPI(
+    return await searchAPI(
         query=query,
         max_response_length=max_response_length,
         max_chunks=max_chunks,
         include_references=include_references,
         max_depth=max_depth,
     )
+
+
+@mcp.tool()
+async def research_api(question: str) -> str:
+    """
+    Research API documentation using intelligent ReAct agent.
+
+    Provides comprehensive analysis and implementation guidance by automatically
+    searching documentation and synthesizing complete answers with examples.
+
+    Args:
+        question: Research question about API documentation
+
+    Returns:
+        Comprehensive answer with examples and implementation guidance
+    """
+    return await research_api_question(question)
 
 
 def start_server(config: Config):
