@@ -14,16 +14,16 @@ logger = logging.getLogger(__name__)
 class KnowledgeRetriever:
     """Main orchestrator for intelligent knowledge retrieval."""
 
-    def __init__(self, vector_store_manager, config: Optional[RetrieverConfig] = None):
+    def __init__(self, vector_store_manager, config: RetrieverConfig):
         """
         Initialize Knowledge Retriever.
 
         Args:
             vector_store_manager: Vector Store Manager instance for search and lookup
-            config: Optional configuration, defaults to environment-based config
+            config: Configuration for retrieval behavior
         """
         self.vector_store = vector_store_manager
-        self.config = config or RetrieverConfig.from_env()
+        self.config = config
 
         # Initialize sub-components
         self.reference_expander = ReferenceExpander(vector_store_manager)

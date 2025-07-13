@@ -1,8 +1,10 @@
 """Data classes for Knowledge Retriever component."""
 
-import os
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List
+
+if TYPE_CHECKING:
+    from ..cli.config import Config
 
 
 @dataclass
@@ -53,13 +55,13 @@ class RetrieverConfig:
     prioritize_primary: bool = True
 
     @classmethod
-    def from_env(cls) -> "RetrieverConfig":
-        """Create configuration from environment variables."""
+    def from_config(cls, config: "Config") -> "RetrieverConfig":
+        """Create configuration from Config object."""
         return cls(
-            max_primary_results=int(os.getenv("RETRIEVAL_MAX_PRIMARY_RESULTS", "5")),
-            max_total_chunks=int(os.getenv("RETRIEVAL_MAX_TOTAL_CHUNKS", "15")),
-            max_depth=int(os.getenv("RETRIEVAL_MAX_DEPTH", "3")),
-            timeout_ms=int(os.getenv("RETRIEVAL_TIMEOUT_MS", "5000")),
-            token_limit=int(os.getenv("CONTEXT_TOKEN_LIMIT", "4000")),
-            prioritize_primary=os.getenv("CONTEXT_PRIORITIZE_PRIMARY", "true").lower() == "true",
+            max_primary_results=config.retrieval_max_primary_results,
+            max_total_chunks=config.retrieval_max_total_chunks,
+            max_depth=config.retrieval_max_depth,
+            timeout_ms=config.retrieval_timeout_ms,
+            token_limit=config.context_token_limit,
+            prioritize_primary=config.context_prioritize_primary,
         )

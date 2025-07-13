@@ -29,7 +29,8 @@ def create_research_agent():
     return create_react_agent(
         model=model,
         tools=[search_chunks_tool, get_chunks_tool],
-        prompt=f"""You are an expert API documentation researcher providing factually accurate information for developers.  # noqa: E501
+        prompt=f"""You are an expert API documentation researcher providing factually accurate information \
+for developers.
 
 {api_context}
 

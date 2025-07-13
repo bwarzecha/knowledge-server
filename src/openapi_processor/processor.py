@@ -2,9 +2,10 @@
 
 import logging
 import os
-from typing import Any, Dict, Iterator, List
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List
 
-from dotenv import load_dotenv
+if TYPE_CHECKING:
+    from ..cli.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -19,25 +20,30 @@ from .validator import OpenAPIValidator, ValidatorConfig
 class OpenAPIProcessor:
     """Main orchestrator for the OpenAPI processing pipeline."""
 
-    def __init__(self):
-        # Load environment configuration
-        load_dotenv()
+    def __init__(self, config: "Config"):
+        """
+        Initialize OpenAPI Processor with configuration.
+
+        Args:
+            config: Configuration object with all settings
+        """
+        self.config = config
 
         # Initialize subcomponents
         self.scanner = DirectoryScanner(
             ScannerConfig(
-                skip_hidden_files=os.getenv("SKIP_HIDDEN_FILES", "true").lower() == "true",
-                supported_extensions=os.getenv("SUPPORTED_EXTENSIONS", ".json,.yaml,.yml").split(","),
+                skip_hidden_files=config.skip_hidden_files,
+                supported_extensions=config.supported_extensions,
             )
         )
         self.parser = OpenAPIParser()
-        self.validator = OpenAPIValidator(ValidatorConfig.from_env())
+        self.validator = OpenAPIValidator(ValidatorConfig.from_config(config))
         self.extractor = ElementExtractor()
         self.graph_builder = GraphBuilder()
         self.assembler = ChunkAssembler()
 
         # Configuration
-        self.log_progress = os.getenv("LOG_PROCESSING_PROGRESS", "true").lower() == "true"
+        self.log_progress = config.log_processing_progress
 
     def process_directory(self, specs_dir: str) -> List[Dict[str, Any]]:
         """

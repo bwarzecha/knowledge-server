@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "knowledge-server"
 version = "0.1.0"
-description = "A specialized MCP server that makes large OpenAPI specifications accessible to LLMs through intelligent chunking and retrieval"
+description = "A specialized MCP server that makes large technical documentation accessible to LLMs through intelligent chunking and retrieval. Supports OpenAPI specifications and markdown documents."
 readme = "README.md"
 license = {text = "MIT"}
 authors = [

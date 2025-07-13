@@ -51,7 +51,7 @@ def index_command(
         # Step 1: Process OpenAPI specifications (unless skipped)
         if not skip_openapi:
             logger.info("📋 Step 1: Processing OpenAPI specifications...")
-            openapi_processor = OpenAPIProcessor()
+            openapi_processor = OpenAPIProcessor(config)
             openapi_chunks = openapi_processor.process_directory(openapi_dir)
 
             if openapi_chunks:
@@ -87,14 +87,7 @@ def index_command(
 
         # Step 3: Build vector store
         logger.info("🧠 Step 3: Building vector store...")
-        vector_store = VectorStoreManager(
-            persist_directory=config.vector_store_dir,
-            collection_name=config.vector_store_collection,
-            embedding_model_name=config.embedding_model,
-            embedding_device=config.embedding_device,
-            max_tokens=config.max_tokens,
-            reset_on_start=True,  # Clean slate for indexing
-        )
+        vector_store = VectorStoreManager.from_config(config, reset_on_start=True)
 
         # Setup and add chunks
         vector_store.setup()

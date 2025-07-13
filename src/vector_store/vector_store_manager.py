@@ -1,9 +1,11 @@
 """Main Vector Store Manager for orchestrating all vector database operations."""
 
 import logging
-import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
+if TYPE_CHECKING:
+    from ..cli.config import Config
 
 from .chromadb_utils import (
     SentenceTransformerEmbeddingFunction,
@@ -26,7 +28,7 @@ class VectorStoreManager:
         self,
         persist_directory: str = "./chromadb_data",
         collection_name: str = "api_knowledge",
-        embedding_model_name: str = "Qwen/Qwen3-Embedding-0.6B",
+        embedding_model_name: str = "dunzhang/stella_en_1.5B_v5",
         embedding_device: str = "mps",
         max_tokens: int = 32000,
         reset_on_start: bool = False,
@@ -58,20 +60,24 @@ class VectorStoreManager:
         logger.info(f"Initialized VectorStoreManager with model {embedding_model_name}")
 
     @classmethod
-    def from_env(cls) -> "VectorStoreManager":
+    def from_config(cls, config: "Config", reset_on_start: bool = False) -> "VectorStoreManager":
         """
-        Create VectorStoreManager from environment variables.
+        Create VectorStoreManager from Config object.
+
+        Args:
+            config: Configuration object with all settings
+            reset_on_start: Whether to reset collection on startup
 
         Returns:
             Configured VectorStoreManager instance
         """
         return cls(
-            persist_directory=os.getenv("CHROMADB_PERSIST_DIR", "./chromadb_data"),
-            collection_name=os.getenv("CHROMA_COLLECTION_NAME", "api_knowledge"),
-            embedding_model_name=os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"),
-            embedding_device=os.getenv("EMBEDDING_DEVICE", "mps"),
-            max_tokens=int(os.getenv("MAX_EMBEDDING_TOKENS", "256")),
-            reset_on_start=os.getenv("CHROMA_RESET_ON_START", "false").lower() == "true",
+            persist_directory=config.vector_store_dir,
+            collection_name=config.vector_store_collection,
+            embedding_model_name=config.embedding_model,
+            embedding_device=config.embedding_device,
+            max_tokens=config.max_tokens,
+            reset_on_start=reset_on_start,
         )
 
     def setup(self) -> None:

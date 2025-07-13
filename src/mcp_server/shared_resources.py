@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 
 from src.cli.config import Config
 from src.retriever import KnowledgeRetriever
+from src.retriever.data_classes import RetrieverConfig
 from src.vector_store.vector_store_manager import VectorStoreManager
 
 
@@ -22,22 +23,16 @@ class SharedResources:
         self.config = config
 
         # Load vector store
-        self.vector_store = VectorStoreManager(
-            persist_directory=config.vector_store_dir,
-            collection_name=config.vector_store_collection,
-            embedding_model_name=config.embedding_model,
-            embedding_device=config.embedding_device,
-            max_tokens=config.max_tokens,
-            reset_on_start=False,  # Use existing data
-        )
+        self.vector_store = VectorStoreManager.from_config(config, reset_on_start=False)
         self.vector_store.setup()
 
         # Load API index
         with open(config.api_index_path, "r") as f:
             self.api_index = json.load(f)
 
-        # Initialize retriever with environment-based config
-        self.retriever = KnowledgeRetriever(self.vector_store)
+        # Initialize retriever with config-based configuration
+        retriever_config = RetrieverConfig.from_config(config)
+        self.retriever = KnowledgeRetriever(self.vector_store, retriever_config)
 
     def is_ready(self) -> bool:
         """Check if all resources are loaded and ready."""

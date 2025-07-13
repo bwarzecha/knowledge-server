@@ -35,9 +35,9 @@ class Config:
         # Vector Store
         self.vector_store_dir = os.getenv("VECTOR_STORE_DIR", "./data/vectorstore")
         self.vector_store_collection = os.getenv("VECTOR_STORE_COLLECTION", "knowledge_base")
-        self.embedding_model = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-        self.embedding_device = os.getenv("EMBEDDING_DEVICE", "cpu")
-        self.max_tokens = int(os.getenv("MAX_TOKENS", "512"))
+        self.embedding_model = os.getenv("EMBEDDING_MODEL", "dunzhang/stella_en_1.5B_v5")
+        self.embedding_device = os.getenv("EMBEDDING_DEVICE", "mps")
+        self.max_tokens = int(os.getenv("MAX_TOKENS", "8192"))
 
         # API Index
         self.api_index_path = os.getenv("API_INDEX_PATH", "./data/api_index.json")
@@ -46,6 +46,14 @@ class Config:
         self.mcp_server_name = os.getenv("MCP_SERVER_NAME", "Knowledge Server")
         self.mcp_server_host = os.getenv("MCP_SERVER_HOST", "localhost")
         self.mcp_server_port = int(os.getenv("MCP_SERVER_PORT", "8000"))
+
+        # Knowledge Retriever Configuration
+        self.retrieval_max_primary_results = int(os.getenv("RETRIEVAL_MAX_PRIMARY_RESULTS", "5"))
+        self.retrieval_max_total_chunks = int(os.getenv("RETRIEVAL_MAX_TOTAL_CHUNKS", "15"))
+        self.retrieval_max_depth = int(os.getenv("RETRIEVAL_MAX_DEPTH", "3"))
+        self.retrieval_timeout_ms = int(os.getenv("RETRIEVAL_TIMEOUT_MS", "5000"))
+        self.context_token_limit = int(os.getenv("CONTEXT_TOKEN_LIMIT", "4000"))
+        self.context_prioritize_primary = os.getenv("CONTEXT_PRIORITIZE_PRIMARY", "true").lower() == "true"
 
         # Validation
         self.min_openapi_version = os.getenv("MIN_OPENAPI_VERSION", "3.0.0")

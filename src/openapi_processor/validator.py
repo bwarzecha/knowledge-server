@@ -1,8 +1,10 @@
 """OpenAPI Validator for specification validation."""
 
-import os
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List
+
+if TYPE_CHECKING:
+    from ..cli.config import Config
 
 
 @dataclass
@@ -29,12 +31,12 @@ class ValidatorConfig:
     require_paths_or_components: bool = True
 
     @classmethod
-    def from_env(cls):
-        """Create config from environment variables."""
+    def from_config(cls, config: "Config") -> "ValidatorConfig":
+        """Create config from Config object."""
         return cls(
-            min_openapi_version=os.getenv("MIN_OPENAPI_VERSION", "3.0.0"),
-            require_info_section=os.getenv("REQUIRE_INFO_SECTION", "true").lower() == "true",
-            require_paths_or_components=os.getenv("REQUIRE_PATHS_OR_COMPONENTS", "true").lower() == "true",
+            min_openapi_version=config.min_openapi_version,
+            require_info_section=config.require_info_section,
+            require_paths_or_components=config.require_paths_or_components,
         )
 
 

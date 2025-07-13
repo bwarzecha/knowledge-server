@@ -36,7 +36,7 @@ class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
     def get_config(self) -> Dict[str, Any]:
         """Return the configuration of the embedding function."""
         # Try to get the actual model name from various possible attributes
-        model_name = "sentence-transformers/all-MiniLM-L6-v2"  # Default fallback
+        model_name = "dunzhang/stella_en_1.5B_v5"  # Default fallback
         if hasattr(self.model, "_modules") and "sentence_bert" in self.model._modules:
             # For newer SentenceTransformer models
             model_name = getattr(self.model, "model_name", model_name)
@@ -50,7 +50,7 @@ class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
     @classmethod
     def build_from_config(cls, config: Dict[str, Any]) -> "SentenceTransformerEmbeddingFunction":
         """Build embedding function from configuration."""
-        model_name = config.get("model_name", "sentence-transformers/all-MiniLM-L6-v2")
+        model_name = config.get("model_name", "dunzhang/stella_en_1.5B_v5")
         max_tokens = config.get("max_tokens")
 
         # Load the model
