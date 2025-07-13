@@ -1,6 +1,5 @@
 """Tests for metadata conversion utilities."""
 
-
 from src.vector_store.metadata_utils import (
     prepare_metadata_for_chromadb,
     restore_metadata_from_chromadb,

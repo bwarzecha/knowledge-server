@@ -1,6 +1,5 @@
 """Integration tests for the complete OpenAPI Processor."""
 
-
 from src.openapi_processor.processor import OpenAPIProcessor
 
 

@@ -1,6 +1,5 @@
 """Tests for Element Extractor."""
 
-
 from src.openapi_processor.extractor import ElementExtractor
 from src.openapi_processor.parser import OpenAPIParser
 

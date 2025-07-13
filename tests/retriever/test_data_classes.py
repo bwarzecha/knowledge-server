@@ -2,7 +2,6 @@
 
 import os
 
-
 from src.retriever.data_classes import Chunk, KnowledgeContext, RetrievalStats, RetrieverConfig
 
 

@@ -1,6 +1,5 @@
 """Tests for Reference Resolver."""
 
-
 from src.openapi_processor.reference_resolver import ReferenceResolver
 
 

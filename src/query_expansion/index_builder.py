@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """Build API index for query expansion - one entry per file."""
 
+import json
 import sys
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
-import json
 from typing import Any, Dict, List
 
 import tiktoken
 
-from src.openapi_processor.parser import OpenAPIParser
-from src.openapi_processor.scanner import DirectoryScanner
+# Add parent directory to path for imports
+sys.path.append(str(Path(__file__).parent.parent.parent))
+
+from src.openapi_processor.parser import OpenAPIParser  # noqa: E402
+from src.openapi_processor.scanner import DirectoryScanner  # noqa: E402
 
 
 class IndexBuilder:
@@ -198,10 +198,10 @@ def main():
     print(f"🔄 Building text-based index from: {directories}")
 
     file_entries = builder.build_index(directories)
-    tokens = builder.save_index(file_entries)
+    builder.save_index(file_entries)
 
     # Show sample entries
-    print(f"\n📄 Sample file entries (first 2):")
+    print("\n📄 Sample file entries (first 2):")
     for entry in file_entries[:2]:
         lines = entry["text"].split("\n")
         print(f"   {entry['file']}: {lines[0]} - {len(lines)} lines")

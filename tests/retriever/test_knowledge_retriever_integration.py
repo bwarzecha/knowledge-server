@@ -112,10 +112,8 @@ class TestKnowledgeRetrieverIntegration:
         assert len(context.primary_chunks) > 0
 
         # Should find schema-related content
-        schema_related = False
         for chunk in context.primary_chunks:
             if "schema" in chunk.document.lower() or chunk.metadata.get("type") == "component":
-                schema_related = True
                 break
 
         # Note: Might not find exact match depending on sample data

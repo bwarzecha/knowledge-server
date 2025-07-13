@@ -96,7 +96,8 @@ def trim_text_to_token_limit(
         trimmed_text = encoding.decode(trimmed_tokens) + "..."
 
         logger.warning(
-            f"Text trimmed from {current_tokens} to {get_token_count(trimmed_text, encoding_name)} tokens (limit: {max_tokens})"
+            f"Text trimmed from {current_tokens} to "
+            f"{get_token_count(trimmed_text, encoding_name)} tokens (limit: {max_tokens})"
         )
         return trimmed_text
 

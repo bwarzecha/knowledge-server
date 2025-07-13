@@ -1,6 +1,5 @@
 """Tests for Graph Builder."""
 
-
 from src.openapi_processor.extractor import ExtractedElement
 from src.openapi_processor.graph_builder import GraphBuilder
 

@@ -1,6 +1,5 @@
 """Complex integration tests for Graph Builder with real OpenAPI samples."""
 
-
 from src.openapi_processor.extractor import ElementExtractor
 from src.openapi_processor.graph_builder import GraphBuilder
 from src.openapi_processor.parser import OpenAPIParser

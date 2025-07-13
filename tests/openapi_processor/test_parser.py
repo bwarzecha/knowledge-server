@@ -4,7 +4,6 @@ import json
 import tempfile
 from pathlib import Path
 
-
 from src.openapi_processor.parser import OpenAPIParser
 
 

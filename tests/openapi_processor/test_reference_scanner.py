@@ -1,6 +1,5 @@
 """Tests for Reference Scanner."""
 
-
 from src.openapi_processor.reference_scanner import ReferenceScanner
 
 

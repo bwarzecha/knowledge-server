@@ -105,7 +105,7 @@ class QueryExpander:
     def _build_prompt(self, query: str, api_context: str) -> str:
         """Build the minimal prompt template."""
         return f"""You are an API-search assistant.
-Expand the user's request so it matches *operationId*, HTTP method, path segments, tags, 
+Expand the user's request so it matches *operationId*, HTTP method, path segments, tags,
 and typical parameter names that appear in the **API index** below.
 **Output** exactly 3 lines:
 

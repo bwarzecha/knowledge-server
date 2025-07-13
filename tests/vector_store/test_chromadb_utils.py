@@ -113,7 +113,7 @@ class TestChromaDBUtils:
     def test_create_collection_with_reset(self, client, embedding_function):
         """Test collection creation with reset."""
         # Create initial collection
-        collection1 = create_collection(client, "reset_test", embedding_function)
+        create_collection(client, "reset_test", embedding_function)
 
         # Create with reset - should delete and recreate
         collection2 = create_collection(client, "reset_test", embedding_function, reset=True)

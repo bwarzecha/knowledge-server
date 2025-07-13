@@ -1,6 +1,5 @@
 """Tests for OpenAPI Validator."""
 
-
 from src.openapi_processor.validator import OpenAPIValidator, ValidatorConfig
 
 
