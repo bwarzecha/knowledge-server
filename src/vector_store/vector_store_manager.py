@@ -16,6 +16,7 @@ from .chromadb_utils import (
     get_collection_info,
     search_collection,
 )
+from .embedding_cache import EmbeddingCache
 from .embedding_utils import load_embedding_model
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,7 @@ class VectorStoreManager:
         self.collection = None
         self.embedding_model = None
         self.embedding_function = None
+        self.embedding_cache = None
 
         logger.info(f"Initialized VectorStoreManager with model {embedding_model_name}")
 
@@ -94,8 +96,13 @@ class VectorStoreManager:
         logger.info(f"Loading embedding model: {self.embedding_model_name}")
         self.embedding_model = load_embedding_model(self.embedding_model_name, device=self.embedding_device)
 
-        # Create embedding function
-        self.embedding_function = SentenceTransformerEmbeddingFunction(self.embedding_model, max_tokens=self.max_tokens)
+        # Create embedding cache
+        self.embedding_cache = EmbeddingCache()
+
+        # Create embedding function with cache
+        self.embedding_function = SentenceTransformerEmbeddingFunction(
+            self.embedding_model, max_tokens=self.max_tokens, cache=self.embedding_cache
+        )
 
         # Create or get collection
         self.collection = create_collection(
@@ -119,7 +126,7 @@ class VectorStoreManager:
             raise RuntimeError("VectorStoreManager not set up. Call setup() first.")
 
         logger.info(f"Adding {len(chunks)} chunks to vector store")
-        add_chunks_to_collection(self.collection, chunks, batch_size)
+        add_chunks_to_collection(self.collection, chunks, batch_size, cache=self.embedding_cache)
 
         # Log final count
         info = self.get_info()
@@ -196,6 +203,7 @@ class VectorStoreManager:
         # Delete and recreate collection
         self.collection = create_collection(self.client, self.collection_name, self.embedding_function, reset=True)
 
+        # Note: To clear the cache, delete the embedding_cache.db file
         logger.info("Collection cleared")
 
     def health_check(self) -> Dict[str, Any]:
@@ -237,6 +245,12 @@ class VectorStoreManager:
                 status["document_count"] = info["count"]
             else:
                 status["errors"].append("ChromaDB collection not created")
+
+            # Check cache
+            if self.embedding_cache:
+                status["embedding_cache"] = True
+            else:
+                status["errors"].append("Embedding cache not initialized")
 
         except Exception as e:
             status["errors"].append(f"Health check error: {str(e)}")

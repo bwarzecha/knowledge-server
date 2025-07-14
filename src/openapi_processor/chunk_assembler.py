@@ -1,5 +1,6 @@
 """Chunk Assembler for creating final chunks with YAML formatting."""
 
+import hashlib
 from typing import Any, Dict, List
 
 import yaml
@@ -108,6 +109,10 @@ class ChunkAssembler:
         # Ensure natural_name exists
         if "natural_name" not in metadata:
             metadata["natural_name"] = self._extract_natural_name(element)
+
+        # Add content hash
+        document = self._convert_to_yaml(element.content)
+        metadata["content_hash"] = hashlib.sha256(document.encode("utf-8")).hexdigest()[:16]
 
         return metadata
 

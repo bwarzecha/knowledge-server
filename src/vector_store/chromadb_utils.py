@@ -8,8 +8,12 @@ from chromadb.config import Settings
 from chromadb.utils.embedding_functions import EmbeddingFunction
 from sentence_transformers import SentenceTransformer
 
+from .embedding_cache import EmbeddingCache
 from .embedding_utils import encode_documents, encode_query
-from .metadata_utils import prepare_metadata_for_chromadb, restore_metadata_from_chromadb
+from .metadata_utils import (
+    prepare_metadata_for_chromadb,
+    restore_metadata_from_chromadb,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -17,16 +21,23 @@ logger = logging.getLogger(__name__)
 class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
     """Custom embedding function for ChromaDB using SentenceTransformers."""
 
-    def __init__(self, model: SentenceTransformer, max_tokens: Optional[int] = None):
+    def __init__(
+        self,
+        model: SentenceTransformer,
+        max_tokens: Optional[int] = None,
+        cache: Optional[EmbeddingCache] = None,
+    ):
         """
         Initialize with a SentenceTransformer model.
 
         Args:
             model: Loaded SentenceTransformer model
             max_tokens: Optional token limit for embeddings
+            cache: Optional embedding cache
         """
         self.model = model
         self.max_tokens = max_tokens
+        self.cache = cache
 
     @staticmethod
     def name() -> str:
@@ -68,6 +79,8 @@ class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
         Returns:
             List of embedding vectors
         """
+        # Note: We can't get content hashes here, so cache won't be used in this path
+        # The cache will be used when called from add_chunks_to_collection
         return encode_documents(input, self.model, max_tokens=self.max_tokens)
 
 
@@ -146,7 +159,10 @@ def create_collection(
 
 
 def add_chunks_to_collection(
-    collection: chromadb.Collection, chunks: List[Dict[str, Any]], batch_size: int = 100
+    collection: chromadb.Collection,
+    chunks: List[Dict[str, Any]],
+    batch_size: int = 100,
+    cache: Optional[EmbeddingCache] = None,
 ) -> None:
     """
     Add chunks to ChromaDB collection in batches.
@@ -155,6 +171,7 @@ def add_chunks_to_collection(
         collection: ChromaDB collection
         chunks: List of chunks with id, document, and metadata
         batch_size: Number of chunks to process in each batch
+        cache: Optional embedding cache to use
     """
     if not chunks:
         logger.info("No chunks to add")
@@ -171,8 +188,33 @@ def add_chunks_to_collection(
             documents = [chunk["document"] for chunk in batch]
             metadatas = [prepare_metadata_for_chromadb(chunk["metadata"]) for chunk in batch]
 
-            # Add to collection
-            collection.add(ids=ids, documents=documents, metadatas=metadatas)
+            # If we have cache and embedding function, compute embeddings with cache
+            if cache and hasattr(collection._embedding_function, "model"):
+                # Extract content hashes from metadata
+                content_hashes = [chunk["metadata"].get("content_hash") for chunk in batch]
+
+                # Only use cache if all chunks have content hashes
+                if all(h is not None for h in content_hashes):
+                    embeddings = encode_documents(
+                        documents,
+                        collection._embedding_function.model,
+                        max_tokens=getattr(collection._embedding_function, "max_tokens", None),
+                        cache=cache,
+                        content_hashes=content_hashes,
+                    )
+                    # Add with precomputed embeddings
+                    collection.add(
+                        ids=ids,
+                        documents=documents,
+                        metadatas=metadatas,
+                        embeddings=embeddings,
+                    )
+                else:
+                    # Fall back to standard add (no cache)
+                    collection.add(ids=ids, documents=documents, metadatas=metadatas)
+            else:
+                # Standard add without cache
+                collection.add(ids=ids, documents=documents, metadatas=metadatas)
 
             batch_num = i // batch_size + 1
             total_batches = (len(chunks) + batch_size - 1) // batch_size

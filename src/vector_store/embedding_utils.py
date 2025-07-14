@@ -6,6 +6,8 @@ from typing import List, Optional
 import tiktoken
 from sentence_transformers import SentenceTransformer
 
+from .embedding_cache import EmbeddingCache
+
 logger = logging.getLogger(__name__)
 
 
@@ -114,6 +116,8 @@ def encode_documents(
     model: SentenceTransformer,
     max_tokens: Optional[int] = None,
     encoding_name: str = "cl100k_base",
+    cache: Optional[EmbeddingCache] = None,
+    content_hashes: Optional[List[str]] = None,
 ) -> List[List[float]]:
     """
     Encode documents for storage in vector database.
@@ -123,6 +127,8 @@ def encode_documents(
         model: Loaded SentenceTransformer model
         max_tokens: Optional token limit per document (will trim if specified)
         encoding_name: Tiktoken encoding to use for token counting
+        cache: Optional embedding cache to use
+        content_hashes: Optional list of content hashes for caching
 
     Returns:
         List of embedding vectors (one per document)
@@ -135,10 +141,65 @@ def encode_documents(
     if max_tokens:
         processed_texts = [trim_text_to_token_limit(text, max_tokens, encoding_name) for text in texts]
 
+    # If cache is provided, try to get cached embeddings
+    if cache and content_hashes and len(content_hashes) == len(texts):
+        # Try to get model name from various attributes
+        model_name = str(model)
+        if hasattr(model, "model_card_data") and isinstance(model.model_card_data, dict):
+            model_name = model.model_card_data.get("model_name", model_name)
+        elif hasattr(model, "model_name"):
+            model_name = model.model_name
+        cached_embeddings, miss_indices = cache.get_embeddings_batch(model_name, content_hashes)
+
+        # If all embeddings are cached, return them
+        if not miss_indices:
+            logger.info(f"Cache hit for all {len(texts)} embeddings")
+            return [emb.tolist() for emb in cached_embeddings]
+
+        # Compute only missing embeddings
+        if miss_indices:
+            logger.info(f"Cache hit for {len(texts) - len(miss_indices)}/{len(texts)} embeddings")
+            texts_to_encode = [processed_texts[i] for i in miss_indices]
+
+            try:
+                # Generate embeddings for missing documents
+                new_embeddings = model.encode(texts_to_encode)
+
+                # Store new embeddings in cache
+                hashes_to_cache = [content_hashes[i] for i in miss_indices]
+                cache.set_embeddings_batch(model_name, hashes_to_cache, [emb for emb in new_embeddings])
+
+                # Combine cached and new embeddings
+                result = []
+                new_emb_idx = 0
+                for i in range(len(texts)):
+                    if cached_embeddings[i] is not None:
+                        result.append(cached_embeddings[i].tolist())
+                    else:
+                        result.append(new_embeddings[new_emb_idx].tolist())
+                        new_emb_idx += 1
+
+                return result
+            except Exception as e:
+                logger.error(f"Failed to encode {len(texts_to_encode)} documents: {e}")
+                raise
+
+    # No cache or cache miss for all - compute all embeddings
     try:
         # Generate embeddings for documents
         # For Stella models, documents don't need prompts (they're the "docs")
         embeddings = model.encode(processed_texts)
+
+        # Store in cache if provided
+        if cache and content_hashes and len(content_hashes) == len(texts):
+            # Try to get model name from various attributes
+            model_name = str(model)
+            if hasattr(model, "model_card_data") and isinstance(model.model_card_data, dict):
+                model_name = model.model_card_data.get("model_name", model_name)
+            elif hasattr(model, "model_name"):
+                model_name = model.model_name
+            cache.set_embeddings_batch(model_name, content_hashes, [emb for emb in embeddings])
+
         # Convert numpy array to list of lists - SentenceTransformer returns numpy array by default
         return embeddings.tolist()
     except Exception as e:
