@@ -478,7 +478,6 @@ async def _filter_and_expand_chunks(
         model = ChatBedrockConverse(
             model=config.reranker_llm_model,
             temperature=config.reranker_llm_temperature,
-            region_name=config.reranker_llm_region,
             max_tokens=config.reranker_llm_max_tokens,
         )
 

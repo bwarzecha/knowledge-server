@@ -22,7 +22,6 @@ def create_research_agent():
     model = ChatBedrockConverse(
         model=config.research_agent_llm_model,
         temperature=0.1,
-        region_name="us-east-1",
         max_tokens=config.research_agent_llm_max_tokens,
     )
 
