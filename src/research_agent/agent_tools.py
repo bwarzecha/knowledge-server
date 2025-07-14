@@ -17,13 +17,47 @@ async def search_chunks_tool(
     max_chunks: int = 25,
     file_filter: Optional[str] = None,
     include_references: bool = False,
+    rerank: bool = True,
+    search_context: Optional[str] = None,
 ) -> dict:
-    """Search API documentation chunks with optional file filtering.
+    """Search API documentation chunks with intelligent LLM-based relevance filtering.
 
-    Use this tool to find relevant documentation chunks. Use file_filter when user mentions
-    specific APIs (e.g., "sponsored-display", "dsp", "seller-central").
+    Use this tool to find relevant documentation chunks. The rerank parameter enables
+    intelligent filtering that dramatically improves result quality by analyzing chunk
+    relevance using LLM understanding.
+
+    IMPORTANT: When rerank=True (default), provide rich search_context to help the LLM
+    make better filtering decisions. Include:
+    - WHY you're searching (user's goal)
+    - WHAT you're trying to accomplish
+    - Any previous findings or context
+
+    Args:
+        query: Search query text
+        max_chunks: Maximum chunks to return after filtering
+        file_filter: Optional API filter ("sponsored-display", "dsp", etc.)
+        include_references: Include reference IDs in response
+        rerank: Enable LLM filtering for better results (default: True)
+        search_context: Rich context about search intent for quality filtering
+
+    Examples:
+        # Basic search
+        search_chunks_tool("authentication", max_chunks=5)
+
+        # With rich context for better filtering
+        search_chunks_tool(
+            query="campaign optimization",
+            search_context=(
+                "User wants to understand how to configure automatic bid "
+                "optimization rules and performance targets for advertising campaigns"
+            ),
+            max_chunks=5
+        )
     """
-    logger.info(f"search_chunks_tool called: query='{query}', max_chunks={max_chunks}, file_filter={file_filter}")
+    logger.info(
+        f"search_chunks_tool called: query='{query}', max_chunks={max_chunks}, "
+        f"file_filter={file_filter}, rerank={rerank}"
+    )
 
     resources = get_shared_resources()
     api_context = generate_api_context()
@@ -35,9 +69,21 @@ async def search_chunks_tool(
         max_chunks=max_chunks,
         file_filter=file_filter,
         include_references=include_references,
+        rerank=rerank,
+        search_context=search_context,
     )
 
     logger.info(f"search_chunks_tool result: {result.total_found} chunks found in {result.search_time_ms:.1f}ms")
+
+    # Log filtering stats if available
+    if result.filtering_stats:
+        stats = result.filtering_stats
+        logger.info(
+            f"LLM filtering: {stats['original_count']} → {stats['filtered_count']} chunks "
+            f"({stats['reduction_ratio']:.1%} reduction), "
+            f"processing_time={stats['processing_time_ms']:.0f}ms, "
+            f"fallback_used={stats['fallback_used']}"
+        )
 
     # Convert to dict for LLM consumption
     return {

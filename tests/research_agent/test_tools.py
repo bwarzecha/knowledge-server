@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from src.cli.config import Config
 from src.openapi_processor.processor import OpenAPIProcessor
 from src.research_agent.tools import generate_api_context, getChunks, searchChunks
 from src.vector_store.vector_store_manager import VectorStoreManager
@@ -41,7 +42,8 @@ class TestResearchAgentTools:
             shutil.copytree(workshop_src, workshop_dst)
 
             # Process OpenAPI specs
-            processor = OpenAPIProcessor()
+            config = Config()
+            processor = OpenAPIProcessor(config)
             chunks = processor.process_directory(str(specs_dir))
 
             # Setup vector store using config from .env

@@ -2,6 +2,7 @@
 
 import os
 
+from src.cli.config import Config
 from src.retriever.data_classes import Chunk, KnowledgeContext, RetrievalStats, RetrieverConfig
 
 
@@ -100,7 +101,7 @@ class TestDataClasses:
         assert config.prioritize_primary is True
 
     def test_retriever_config_from_env(self):
-        """Test RetrieverConfig creation from environment variables."""
+        """Test RetrieverConfig creation from environment variables via Config."""
         # Set environment variables
         env_vars = {
             "RETRIEVAL_MAX_PRIMARY_RESULTS": "8",
@@ -118,7 +119,8 @@ class TestDataClasses:
             os.environ[key] = value
 
         try:
-            config = RetrieverConfig.from_env()
+            main_config = Config()
+            config = RetrieverConfig.from_config(main_config)
 
             assert config.max_primary_results == 8
             assert config.max_total_chunks == 20
@@ -153,7 +155,8 @@ class TestDataClasses:
             os.environ.pop(key, None)
 
         try:
-            config = RetrieverConfig.from_env()
+            main_config = Config()
+            config = RetrieverConfig.from_config(main_config)
 
             # Should use defaults
             assert config.max_primary_results == 5

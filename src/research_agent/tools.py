@@ -1,12 +1,18 @@
 """Core tools for Research Agent functionality."""
 
 import json
+import logging
 import time
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
+from langchain_aws import ChatBedrockConverse
+
+from ..cli.config import Config
 from ..vector_store.vector_store_manager import VectorStoreManager
 from .data_classes import ChunkSummary, FullChunk, RetrievalResults, SearchResults
+
+logger = logging.getLogger(__name__)
 
 
 async def searchChunks(
@@ -16,9 +22,11 @@ async def searchChunks(
     max_chunks: int = 25,
     file_filter: Optional[str] = None,
     include_references: bool = False,
+    rerank: bool = True,
+    search_context: Optional[str] = None,
 ) -> SearchResults:
     """
-    Search for relevant chunks with optional file filtering.
+    Search for relevant chunks with optional LLM-based relevance filtering.
 
     Args:
         vector_store: VectorStoreManager instance for search operations
@@ -27,11 +35,24 @@ async def searchChunks(
         max_chunks: Maximum chunks to return (default: 25)
         file_filter: Optional file pattern (e.g., "sponsored-display", "dsp")
         include_references: Whether to include ref_ids in response
+        rerank: Whether to apply LLM-based relevance filtering (default: True)
+        search_context: Enhanced context about search intent for better filtering
 
     Returns:
-        SearchResults with chunk summaries and metadata
+        SearchResults with chunk summaries, metadata, and optional filtering stats
     """
     start_time = time.time()
+
+    # Load configuration for filtering
+    config = Config()
+
+    # Calculate search limit based on reranking strategy
+    if rerank:
+        search_limit = int(max_chunks * config.chunk_filtering_oversample_multiplier)
+        logger.info(f"Reranking enabled: searching for {search_limit} chunks, filtering to {max_chunks}")
+    else:
+        search_limit = max_chunks
+        logger.info(f"Reranking disabled: searching for {search_limit} chunks directly")
 
     # Build metadata filters for file filtering
     filters = None
@@ -54,8 +75,7 @@ async def searchChunks(
             filters = {"source_file": {"$eq": "__no_match__"}}
 
     # Perform vector search with proper filters
-    search_results = vector_store.search(query, limit=max_chunks, filters=filters)
-    search_time_ms = (time.time() - start_time) * 1000
+    search_results = vector_store.search(query, limit=search_limit, filters=filters)
 
     # Convert to ChunkSummary objects
     chunks = []
@@ -74,11 +94,9 @@ async def searchChunks(
         distance = result.get("distance", 1.0)
         relevance_score = max(0.0, min(1.0, 1.0 - distance))
 
-        # Create content preview (first 200 chars)
+        # Use full content (no artificial truncation)
         content = result.get("document", "")
-        content_preview = content[:200].strip()
-        if len(content) > 200:
-            content_preview += "..."
+        content_preview = content.strip()
 
         # Create human-readable title
         title = natural_name or f"{source_file}:{result.get('id', 'unknown')}"
@@ -103,12 +121,40 @@ async def searchChunks(
         )
         chunks.append(chunk_summary)
 
+    # Apply LLM-based filtering if enabled
+    filtering_stats = None
+    if rerank and chunks:
+        try:
+            filtered_chunks, filtering_stats = await _filter_and_expand_chunks(
+                chunks=chunks,
+                query=query,
+                search_context=search_context,
+                target_count=max_chunks,
+                vector_store=vector_store,
+                config=config,
+            )
+            chunks = filtered_chunks
+            logger.info(
+                f"Applied LLM filtering: {filtering_stats['original_count']} -> "
+                f"{filtering_stats['filtered_count']} chunks"
+            )
+        except Exception as e:
+            logger.error(f"LLM filtering failed: {e}. Continuing with original chunks.")
+            # Use fallback: just trim to max_chunks
+            chunks = chunks[:max_chunks]
+    elif not rerank:
+        # No reranking: just trim to max_chunks if needed
+        chunks = chunks[:max_chunks]
+
+    total_time_ms = (time.time() - start_time) * 1000
+
     return SearchResults(
         chunks=chunks,
         total_found=len(chunks),
-        search_time_ms=search_time_ms,
+        search_time_ms=total_time_ms,
         files_searched=list(files_searched),
         api_context=api_context,
+        filtering_stats=filtering_stats,
     )
 
 
@@ -297,3 +343,195 @@ def generate_api_context(api_index_path: str = "data/api_index.json") -> str:
 
     except Exception:
         return "Available API Files: (context unavailable)"
+
+
+def _build_intelligence_prompt(
+    query: str, search_context: Optional[str], chunk_info: List[Dict], target_count: int
+) -> str:
+    """Build prompt for LLM relevance assessment and expansion decisions."""
+
+    # Enhanced context for better filtering decisions
+    context_section = ""
+    if search_context:
+        context_section = f"""
+Search Context: {search_context}
+
+This context explains WHY this search was initiated and WHAT the user is trying to accomplish.
+Use this context to make better relevance decisions.
+"""
+
+    prompt = f"""You are an expert API documentation analyst. \
+Evaluate chunks for relevance to the user's specific needs and decide appropriate expansion strategy.
+
+User Query: "{query}"{context_section}
+
+For each relevant chunk, decide the best action to provide comprehensive but focused context.
+
+Chunks to evaluate:
+"""
+
+    for chunk in chunk_info:
+        prompt += f"""
+Chunk ID: {chunk["id"]}
+Title: {chunk["title"]}
+Type: {chunk["type"]}
+File: {chunk["file"]}
+References: {chunk["ref_ids"]}
+Vector Score: {chunk["relevance_score"]:.3f}
+Content:
+{chunk["content"]}
+
+---
+"""
+
+    prompt += f"""
+Instructions:
+1. Evaluate each chunk for relevance to the user's query and context
+2. For relevant chunks, decide the appropriate action based on content and references:
+   - KEEP: Chunk is complete and directly answers the query
+   - EXPAND_1: Needs basic context from immediate references
+   - EXPAND_3: Needs moderate expansion for schemas or related concepts
+   - EXPAND_5: Needs deep expansion for complex nested structures
+   - DISCARD: Not relevant to the query or context
+3. Consider chunk type, references, and search context when deciding expansion depth
+4. Aim for comprehensive but focused results (target ~{target_count} relevant chunks)
+
+Response format: One decision per line
+chunk_id -> action
+
+Example:
+sd-api:CreateCampaign -> EXPAND_3
+dsp-api:GetAudiences -> KEEP
+sd-api:ErrorCodes -> DISCARD
+
+Note: Any chunk not mentioned is automatically discarded
+"""
+
+    return prompt
+
+
+def _parse_relevance_response(response: str) -> Dict[str, str]:
+    """Parse LLM response to extract chunk decisions by ID."""
+    try:
+        # Parse line-by-line "chunk_id -> action" format (handles spaces around ->)
+        decisions = {}
+        for line in response.strip().split("\n"):
+            line = line.strip()
+            if "->" in line and line:
+                # Split on arrow separator, handling optional spaces
+                parts = line.split("->", 1)
+                if len(parts) == 2:
+                    chunk_id, action = parts
+                    decisions[chunk_id.strip()] = action.strip()
+
+        logger.info(f"Parsed {len(decisions)} chunk decisions from LLM response")
+        return decisions
+    except Exception as e:
+        logger.warning(f"Failed to parse LLM response: {response}. Error: {e}")
+        return {}  # Return empty dict to trigger fallback
+
+
+async def _filter_and_expand_chunks(
+    chunks: List[ChunkSummary],
+    query: str,
+    search_context: Optional[str],
+    target_count: int,
+    vector_store: VectorStoreManager,
+    config: Config,
+) -> Tuple[List[ChunkSummary], Dict[str, Any]]:
+    """
+    Use LLM to filter chunks and make intelligent expansion decisions.
+
+    Args:
+        chunks: List of chunk summaries from vector search
+        query: Original user query
+        search_context: Enhanced context about the search intent
+        target_count: Desired number of chunks after filtering
+        vector_store: For chunk lookups and validation
+        config: Configuration for LLM settings
+
+    Returns:
+        Tuple of (filtered_chunks, processing_stats)
+    """
+    start_time = time.time()
+
+    # Prepare chunk information for LLM with full content and references
+    chunk_info = []
+    for chunk in chunks:
+        chunk_info.append(
+            {
+                "id": chunk.chunk_id,
+                "title": chunk.title,
+                "content": chunk.content_preview,  # Full content (no truncation)
+                "type": chunk.chunk_type,
+                "file": chunk.file_name,
+                "ref_ids": chunk.ref_ids,
+                "relevance_score": chunk.relevance_score,
+            }
+        )
+
+    # Build LLM prompt with enhanced context
+    prompt = _build_intelligence_prompt(query, search_context, chunk_info, target_count)
+
+    try:
+        # Create dedicated re-ranker LLM model with separate config
+        model = ChatBedrockConverse(
+            model=config.reranker_llm_model,
+            temperature=config.reranker_llm_temperature,
+            region_name=config.reranker_llm_region,
+            max_tokens=config.reranker_llm_max_tokens,
+        )
+
+        # Call LLM for relevance assessment
+        logger.info(f"Calling LLM to filter {len(chunks)} chunks for query: {query[:50]}...")
+        response = await model.ainvoke([{"role": "user", "content": prompt}])
+
+        # Parse LLM response to get chunk decisions by ID
+        chunk_decisions = _parse_relevance_response(response.content)
+
+        if not chunk_decisions:
+            raise ValueError("No valid decisions parsed from LLM response")
+
+        # Filter chunks based on LLM decisions
+        filtered_chunks = []
+        for chunk in chunks:
+            action = chunk_decisions.get(chunk.chunk_id, "DISCARD")
+            if action != "DISCARD":
+                filtered_chunks.append(chunk)
+
+        filtering_time = (time.time() - start_time) * 1000
+
+        stats = {
+            "llm_intelligence_enabled": True,
+            "original_count": len(chunks),
+            "filtered_count": len(filtered_chunks),
+            "reduction_ratio": 1.0 - (len(filtered_chunks) / len(chunks)) if chunks else 0.0,
+            "decisions": chunk_decisions,
+            "processing_time_ms": filtering_time,
+            "fallback_used": False,
+        }
+
+        logger.info(
+            f"LLM filtering: {len(chunks)} -> {len(filtered_chunks)} chunks "
+            f"({stats['reduction_ratio']:.1%} reduction) in {filtering_time:.1f}ms"
+        )
+
+        return filtered_chunks, stats
+
+    except Exception as e:
+        # Fallback: return top chunks by vector similarity
+        logger.warning(f"LLM intelligence failed: {e}. Using fallback.")
+        fallback_chunks = chunks[:target_count]
+
+        stats = {
+            "llm_intelligence_enabled": True,
+            "original_count": len(chunks),
+            "filtered_count": len(fallback_chunks),
+            "reduction_ratio": 1.0 - (len(fallback_chunks) / len(chunks)) if chunks else 0.0,
+            "decisions": {},
+            "processing_time_ms": 0,
+            "fallback_used": True,
+            "error": str(e),
+        }
+
+        return fallback_chunks, stats

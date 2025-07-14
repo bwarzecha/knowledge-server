@@ -2,12 +2,14 @@
 
 from typing import Any, Dict, List
 
+from src.cli.config import Config
 from src.openapi_processor.processor import OpenAPIProcessor
 
 
 def get_real_test_chunks() -> List[Dict[str, Any]]:
     """Get real chunks from openapi-workshop samples for testing."""
-    processor = OpenAPIProcessor()
+    config = Config()
+    processor = OpenAPIProcessor(config)
     chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
     return chunks
 

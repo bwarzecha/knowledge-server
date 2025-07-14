@@ -6,8 +6,10 @@ from pathlib import Path
 
 import pytest
 
+from src.cli.config import Config
 from src.openapi_processor.processor import OpenAPIProcessor
-from src.retriever import KnowledgeRetriever, RetrieverConfig
+from src.retriever import KnowledgeRetriever
+from src.retriever.data_classes import RetrieverConfig
 from src.vector_store.vector_store_manager import VectorStoreManager
 
 
@@ -24,7 +26,8 @@ class TestKnowledgeRetrieverIntegration:
     @pytest.fixture(scope="class")
     def real_chunks(self):
         """Generate real chunks from OpenAPI samples."""
-        processor = OpenAPIProcessor()
+        config = Config()
+        processor = OpenAPIProcessor(config)
         chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
         return chunks
 

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from src.cli.config import Config
 from src.openapi_processor.processor import OpenAPIProcessor
 from src.vector_store.vector_store_manager import VectorStoreManager
 
@@ -24,7 +25,8 @@ class TestVectorStoreIntegration:
     @pytest.fixture(scope="class")
     def openapi_chunks(self):
         """Process OpenAPI files and return chunks."""
-        processor = OpenAPIProcessor()
+        config = Config()
+        processor = OpenAPIProcessor(config)
         chunks = processor.process_directory("samples")
         # Use subset for testing to keep it manageable
         return chunks[:100]  # First 100 chunks

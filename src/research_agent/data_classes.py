@@ -1,7 +1,7 @@
 """Data classes for Research Agent tools."""
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -26,6 +26,7 @@ class SearchResults:
     search_time_ms: float
     files_searched: List[str]
     api_context: str
+    filtering_stats: Optional[Dict[str, Any]] = None
 
 
 @dataclass

@@ -55,6 +55,19 @@ class Config:
         self.context_token_limit = int(os.getenv("CONTEXT_TOKEN_LIMIT", "4000"))
         self.context_prioritize_primary = os.getenv("CONTEXT_PRIORITIZE_PRIMARY", "true").lower() == "true"
 
+        # Intelligent Chunk Filtering Configuration
+        self.chunk_filtering_oversample_multiplier = float(os.getenv("CHUNK_FILTERING_OVERSAMPLE_MULTIPLIER", "1.6"))
+        self.chunk_filtering_llm_timeout_ms = int(os.getenv("CHUNK_FILTERING_LLM_TIMEOUT_MS", "10000"))
+
+        # Re-ranker LLM Configuration (separate from main research agent)
+        self.reranker_llm_provider = os.getenv("RERANKER_LLM_PROVIDER", "bedrock")
+        self.reranker_llm_model = os.getenv("RERANKER_LLM_MODEL", "us.anthropic.claude-3-5-haiku-20241022-v1:0")
+        self.reranker_llm_region = os.getenv("RERANKER_LLM_REGION", "us-east-1")
+        self.reranker_llm_temperature = float(os.getenv("RERANKER_LLM_TEMPERATURE", "0.1"))
+        self.reranker_llm_max_tokens = int(
+            os.getenv("RERANKER_LLM_MAX_TOKENS", "2048")
+        )  # Sufficient for decision list output
+
         # Validation
         self.min_openapi_version = os.getenv("MIN_OPENAPI_VERSION", "3.0.0")
         self.require_info_section = os.getenv("REQUIRE_INFO_SECTION", "true").lower() == "true"

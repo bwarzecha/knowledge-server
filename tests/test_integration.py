@@ -1,5 +1,6 @@
 """Integration tests for the complete OpenAPI Processor."""
 
+from src.cli.config import Config
 from src.openapi_processor.processor import OpenAPIProcessor
 
 
@@ -8,7 +9,8 @@ class TestOpenAPIProcessorIntegration:
 
     def test_process_simple_sample_directory(self):
         """Test processing a simple sample with known structure."""
-        processor = OpenAPIProcessor()
+        config = Config()
+        processor = OpenAPIProcessor(config)
 
         # Process just one simple file by targeting a specific sample
         chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
@@ -44,7 +46,8 @@ class TestOpenAPIProcessorIntegration:
 
     def test_reference_resolution_works(self):
         """Test that references are properly resolved between chunks."""
-        processor = OpenAPIProcessor()
+        config = Config()
+        processor = OpenAPIProcessor(config)
 
         # Use a sample with known references
         chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
@@ -69,7 +72,8 @@ class TestOpenAPIProcessorIntegration:
 
     def test_content_preservation(self):
         """Test that original OpenAPI content is preserved in chunks."""
-        processor = OpenAPIProcessor()
+        config = Config()
+        processor = OpenAPIProcessor(config)
 
         chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
 
@@ -91,7 +95,8 @@ class TestOpenAPIProcessorIntegration:
 
     def test_different_file_types(self):
         """Test processing both JSON and YAML files."""
-        processor = OpenAPIProcessor()
+        config = Config()
+        processor = OpenAPIProcessor(config)
 
         # Test JSON files
         json_chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")

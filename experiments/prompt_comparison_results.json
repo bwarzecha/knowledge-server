@@ -1,0 +1,23 @@
+{
+  "timestamp": 1752457708.314608,
+  "tests": [
+    {
+      "query": "authentication API key bearer token",
+      "context": "Developer needs to authenticate API calls with proper authorization headers",
+      "current": {},
+      "optimized": {}
+    },
+    {
+      "query": "create campaign required fields",
+      "context": "Developer wants to create advertising campaigns and needs all required parameters",
+      "current": {},
+      "optimized": {}
+    },
+    {
+      "query": "error handling status codes",
+      "context": "Developer needs to handle API errors and understand response codes",
+      "current": {},
+      "optimized": {}
+    }
+  ]
+}
