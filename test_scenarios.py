@@ -51,8 +51,8 @@ class ScenarioTester:
         self.vector_store = VectorStoreManager(
             persist_directory=str(Path(self.temp_dir) / "chromadb"),
             collection_name="scenario_test",
-            embedding_model_name="Snowflake/snowflake-arctic-embed-m-v1.5",
-            embedding_device="mps",  # Efficient 109M param model works well on MPS
+            embedding_model_name="sentence-transformers/all-MiniLM-L6-v2",
+            embedding_device="mps",  # Fast 22M param model for testing
             max_tokens=8192,  # Much higher limit for comprehensive chunks
             reset_on_start=True
         )

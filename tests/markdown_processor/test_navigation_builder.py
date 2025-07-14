@@ -1,6 +1,5 @@
 """Tests for NavigationBuilder functionality."""
 
-
 from src.markdown_processor.header_extractor import Header
 from src.markdown_processor.navigation_builder import NavigationBuilder
 from src.markdown_processor.section_splitter import SectionData

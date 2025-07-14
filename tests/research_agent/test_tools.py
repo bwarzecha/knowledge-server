@@ -50,8 +50,8 @@ class TestResearchAgentTools:
             vector_store = VectorStoreManager(
                 persist_directory=str(vector_dir),
                 collection_name="test_research_agent",
-                embedding_model_name="dunzhang/stella_en_1.5B_v5",  # From .env
-                embedding_device="cpu",
+                embedding_model_name="sentence-transformers/all-MiniLM-L6-v2",  # Fast model for testing
+                embedding_device="mps",
                 reset_on_start=True,
             )
             vector_store.setup()
@@ -73,6 +73,7 @@ class TestResearchAgentTools:
             }
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_search_chunks_basic_functionality(self, temp_environment):
         """Test basic searchChunks functionality with simple query."""
         # Setup
@@ -119,6 +120,7 @@ class TestResearchAgentTools:
             assert isinstance(chunk.ref_ids, list)
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_search_chunks_with_references_included(self, temp_environment):
         """Test searchChunks with reference IDs included."""
         # Setup
@@ -152,6 +154,7 @@ class TestResearchAgentTools:
                 assert ":" in ref_id  # Should be file:path format
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_search_chunks_file_filtering(self, temp_environment):
         """Test searchChunks with file filtering capability."""
         # Setup
@@ -188,6 +191,7 @@ class TestResearchAgentTools:
                 assert "train-travel" in file_name or "train" in file_name
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_search_chunks_no_matching_filter(self, temp_environment):
         """Test searchChunks with non-matching file filter."""
         # Setup
@@ -212,6 +216,7 @@ class TestResearchAgentTools:
         assert len(actual.files_searched) == 0
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_get_chunks_basic_retrieval(self, temp_environment):
         """Test basic getChunks functionality without expansion."""
         # Setup
@@ -256,6 +261,7 @@ class TestResearchAgentTools:
             assert isinstance(chunk.metadata, dict)
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_get_chunks_with_reference_expansion(self, temp_environment):
         """Test getChunks with reference expansion."""
         # Setup
@@ -306,6 +312,7 @@ class TestResearchAgentTools:
                 assert chunk.expansion_depth <= expected["max_depth"]
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_get_chunks_truncation_behavior(self, temp_environment):
         """Test getChunks truncation with max_total_chunks limit."""
         # Setup
@@ -371,6 +378,7 @@ class TestResearchAgentTools:
         assert actual.truncated == expected["truncated"]
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_get_chunks_circular_reference_protection(self, temp_environment):
         """Test getChunks handles circular references properly."""
         # Setup
@@ -452,6 +460,7 @@ class TestResearchAgentTools:
         assert actual == expected
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_complex_nesting_deep_expansion(self, temp_environment):
         """Test deep schema expansion with complex-nesting.json."""
         # Setup
@@ -501,6 +510,7 @@ class TestResearchAgentTools:
             assert len(depth_levels) >= 1  # At least some depth variation
 
     @pytest.mark.asyncio
+    @pytest.mark.bedrock
     async def test_multi_file_workshop_search(self, temp_environment):
         """Test search across multiple workshop files."""
         # Setup

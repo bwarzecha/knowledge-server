@@ -180,7 +180,10 @@ class TestVectorStoreIntegration:
         vector_store.setup()
 
         # Get larger subset of chunks
-        processor = OpenAPIProcessor()
+        from src.cli.config import Config
+
+        config = Config()
+        processor = OpenAPIProcessor(config)
         all_chunks = processor.process_directory("samples")
         large_subset = all_chunks[:200]  # Use 200 chunks
 
