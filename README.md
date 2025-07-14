@@ -123,6 +123,8 @@ knowledge-server ask "API rate limits" --max-chunks 30 --max-depth 2 --no-refere
 
 ## MCP Client Configuration
 
+**Important**: All MCP configurations must use the Python executable from the virtual environment (`venv/bin/python`) to ensure all dependencies are available.
+
 ### Claude Desktop
 
 Add to your Claude Desktop configuration file:
@@ -147,13 +149,14 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-Or using the convenience script:
+Or using the convenience script (make sure it's executable: `chmod +x run_server.sh`):
 
 ```json
 {
   "mcpServers": {
     "knowledge-server": {
-      "command": "/path/to/knowledge-server/run_server.sh"
+      "command": "/path/to/knowledge-server/run_server.sh",
+      "cwd": "/path/to/knowledge-server"
     }
   }
 }
@@ -167,9 +170,12 @@ Add to your Cline MCP settings:
 {
   "mcpServers": {
     "knowledge-server": {
-      "command": "python",
+      "command": "/path/to/knowledge-server/venv/bin/python",
       "args": ["-m", "src.mcp_server.server"],
-      "cwd": "/path/to/knowledge-server"
+      "cwd": "/path/to/knowledge-server",
+      "env": {
+        "PYTHONPATH": "/path/to/knowledge-server"
+      }
     }
   }
 }
