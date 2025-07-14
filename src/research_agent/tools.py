@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from botocore.config import Config as BotocoreConfig
 from langchain_aws import ChatBedrockConverse
 
 from ..cli.config import Config
@@ -474,11 +475,17 @@ async def _filter_and_expand_chunks(
     prompt = _build_intelligence_prompt(query, search_context, chunk_info, target_count)
 
     try:
+        # Configure retry behavior at AWS SDK level for reranker
+        aws_config = BotocoreConfig(
+            retries={"max_attempts": config.chunk_filtering_llm_retry_max_attempts, "mode": "standard"}
+        )
+
         # Create dedicated re-ranker LLM model with separate config
         model = ChatBedrockConverse(
             model=config.reranker_llm_model,
             temperature=config.reranker_llm_temperature,
             max_tokens=config.reranker_llm_max_tokens,
+            config=aws_config,
         )
 
         # Call LLM for relevance assessment

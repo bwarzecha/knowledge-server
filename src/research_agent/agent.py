@@ -2,6 +2,7 @@
 
 import logging
 
+from botocore.config import Config as BotocoreConfig
 from langchain_aws import ChatBedrockConverse
 from langgraph.prebuilt import create_react_agent
 
@@ -18,11 +19,17 @@ def create_research_agent():
     # Load configuration
     config = Config()
 
+    # Configure retry behavior at AWS SDK level
+    aws_config = BotocoreConfig(
+        retries={"max_attempts": config.research_agent_llm_retry_max_attempts, "mode": "standard"}
+    )
+
     # Create Bedrock model with configurable model and token limit
     model = ChatBedrockConverse(
         model=config.research_agent_llm_model,
         temperature=0.1,
         max_tokens=config.research_agent_llm_max_tokens,
+        config=aws_config,
     )
 
     # Generate API context for system prompt

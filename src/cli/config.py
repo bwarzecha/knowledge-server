@@ -73,6 +73,10 @@ class Config:
             "RESEARCH_AGENT_LLM_MODEL", "us.anthropic.claude-sonnet-4-20250514-v1:0"
         )
         self.research_agent_llm_max_tokens = int(os.getenv("RESEARCH_AGENT_LLM_MAX_TOKENS", "40000"))
+        self.research_agent_llm_retry_max_attempts = int(os.getenv("RESEARCH_AGENT_LLM_RETRY_MAX_ATTEMPTS", "3"))
+
+        # Chunk Filtering LLM Retry Configuration
+        self.chunk_filtering_llm_retry_max_attempts = int(os.getenv("CHUNK_FILTERING_LLM_RETRY_MAX_ATTEMPTS", "3"))
 
         # Validation
         self.min_openapi_version = os.getenv("MIN_OPENAPI_VERSION", "3.0.0")
