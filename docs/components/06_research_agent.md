@@ -256,9 +256,9 @@ def create_research_agent(llm_provider: str = "bedrock"):
     if llm_provider == "bedrock":
         from langchain_aws import ChatBedrockConverse
         model = ChatBedrockConverse(
-            model="us.anthropic.claude-3-5-haiku-20241022-v1:0",
+            model="us.anthropic.claude-sonnet-4-20250514-v1:0",
             temperature=0.1,
-            max_tokens=8192
+            max_tokens=40000
         )
     elif llm_provider == "llama_cpp":
         from langchain_community.chat_models import ChatLlamaCpp
@@ -401,11 +401,13 @@ result = await agent.ainvoke({
 
 ### Environment Variables
 ```bash
-# Research Agent Configuration
-RESEARCH_AGENT_ENABLED=true
-RESEARCH_LLM_PROVIDER=bedrock          # "bedrock", "llama_cpp", or model string
-RESEARCH_TEMPERATURE=0.1
-RESEARCH_MODEL_PATH=/path/to/model.gguf  # For llama_cpp only
+# Research Agent Configuration (main agent for answering queries)
+RESEARCH_AGENT_LLM_MODEL=us.anthropic.claude-sonnet-4-20250514-v1:0  # Main research agent model
+RESEARCH_AGENT_LLM_MAX_TOKENS=40000                                   # Max tokens for comprehensive responses
+
+# Re-ranker LLM Configuration (separate from main research agent)
+RERANKER_LLM_MODEL=us.anthropic.claude-3-5-haiku-20241022-v1:0      # Fast re-ranking model
+RERANKER_LLM_MAX_TOKENS=2048                                         # Sufficient for decision list output
 
 # Tool Configuration  
 GETCHUNKS_MAX_DEPTH=10                 # Maximum expansion depth
@@ -497,13 +499,15 @@ async def research_api(
 
 **Test Coverage**: 100% of research agent tool tests passing
 
-### 🔄 Phase 2: LangGraph Integration (IN PROGRESS)
-**Status**: AWS Bedrock PoC completed, production implementation next
+### ✅ Phase 2: LangGraph Integration (COMPLETED)
+**Status**: Production LangGraph agent implemented with Claude Sonnet 4
 
 - ✅ **AWS Bedrock Tool Calling PoC**: Verified ChatBedrockConverse + tool binding works
-- ⏳ **Production LangGraph Agent**: Ready to implement with existing tools
-- ⏳ **LangChain Tool Wrappers**: Convert searchChunks/getChunks to @tool decorators
-- ⏳ **MCP Server Integration**: Add research_api tool to server
+- ✅ **Production LangGraph Agent**: Implemented with configurable model support
+- ✅ **LangChain Tool Wrappers**: Converted searchChunks/getChunks to @tool decorators
+- ✅ **MCP Server Integration**: research_api tool available in MCP server
+- ✅ **Enhanced Prompt Engineering**: Comprehensive schema-based response generation
+- ✅ **Configuration System**: Separate models for main agent (Sonnet 4) and re-ranker (Haiku)
 
 ### ⏳ Phase 3: Advanced Features (PENDING)
 - LLaMA.cpp tool calling PoC (lower priority)
@@ -511,12 +515,18 @@ async def research_api(
 - Performance optimization
 - Production deployment configuration
 
-## Next Steps
+## Performance Improvements
 
-**Immediate Priority**: Implement LangGraph ReAct Agent
-1. Create LangChain tool wrappers for searchChunks and getChunks
-2. Implement create_react_agent with ChatBedrockConverse
-3. Add research_api tool to MCP server
-4. Test end-to-end agent functionality
+**Recent Enhancements**: 
+1. **Model Upgrade**: Upgraded main research agent from Haiku to Claude Sonnet 4 for better comprehension
+2. **Token Limit Increase**: Increased max_tokens from 8192 to 40000 for comprehensive responses
+3. **Enhanced Prompt Engineering**: Updated prompt to request complete schemas, examples, and hierarchical explanations
+4. **Configuration Separation**: Separate models for main agent (comprehensive) and re-ranker (fast)
 
-The foundation is complete - all core tools are implemented, tested, and ready for LangGraph integration.
+**Results**: 
+- More comprehensive responses with complete schema definitions
+- Better understanding of complex API relationships
+- Detailed field-by-field explanations with constraints and examples
+- Improved developer experience with implementable documentation
+
+The research agent is now production-ready with comprehensive schema-based response generation.

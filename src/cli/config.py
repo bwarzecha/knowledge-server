@@ -68,6 +68,12 @@ class Config:
             os.getenv("RERANKER_LLM_MAX_TOKENS", "2048")
         )  # Sufficient for decision list output
 
+        # Research Agent LLM Configuration (main agent, not re-ranker)
+        self.research_agent_llm_model = os.getenv(
+            "RESEARCH_AGENT_LLM_MODEL", "us.anthropic.claude-sonnet-4-20250514-v1:0"
+        )
+        self.research_agent_llm_max_tokens = int(os.getenv("RESEARCH_AGENT_LLM_MAX_TOKENS", "40000"))
+
         # Validation
         self.min_openapi_version = os.getenv("MIN_OPENAPI_VERSION", "3.0.0")
         self.require_info_section = os.getenv("REQUIRE_INFO_SECTION", "true").lower() == "true"
