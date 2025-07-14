@@ -99,10 +99,12 @@ class NavigationBuilder:
             return f"{filename}:document"
         elif section.header:
             section_identifier = self._slugify(section.header.text)
+            # Add line number to ensure uniqueness
+            line_num = section.header.line_number
             # Handle split sections
             if section.is_split_section and section.split_index and section.split_index > 1:
-                return f"{filename}:{section_identifier}-{section.split_index}"
-            return f"{filename}:{section_identifier}"
+                return f"{filename}:{section_identifier}:L{line_num}-{section.split_index}"
+            return f"{filename}:{section_identifier}:L{line_num}"
         else:
             # Fallback
             return f"{filename}:section-{index}"
