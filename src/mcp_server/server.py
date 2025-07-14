@@ -26,17 +26,36 @@ async def search_api(
     max_depth: int = 3,
 ) -> str:
     """
-    Search API documentation and return relevant chunks.
+    WHEN TO USE: Direct lookups for specific schema fields, endpoint details, or known API elements.
+    Use when you know exactly what you're looking for in a specific schema or API endpoint.
+
+    BEST FOR:
+    - Specific field definitions in known schemas
+    - Direct API endpoint parameters and responses
+    - Exact error codes and status messages
+    - Authentication/authorization details for specific endpoints
+    - Simple field value constraints or enums
+
+    EXAMPLES:
+    - "What fields are required in the Campaign schema?"
+    - "Show me the bidding parameters for Sponsored Products"
+    - "What authentication headers does the POST /campaigns endpoint require?"
+    - "What are the possible values for campaign state field?"
+
+    NOT FOR COMPLEX ANALYSIS - Use research_api instead for:
+    - Understanding relationships between multiple schemas
+    - "What do I need to create a Sponsored Display campaign?" (needs campaign + ad group + targeting + ad schemas)
+    - "What creative types exist in Sponsored Display?" (requires traversing multiple schema references)
 
     Args:
-        query: Natural language search query for API documentation
-        max_response_length: Maximum response length in tokens (for LLM context window)
-        max_chunks: Maximum number of chunks to retrieve from knowledge base
-        include_references: Whether to follow references between chunks for complete context
-        max_depth: Maximum depth for reference expansion (1-5, default 3)
+        query: Specific search query (use exact schema names, field names, endpoint paths when known)
+        max_response_length: Token limit for response (default 4000 works for most direct lookups)
+        max_chunks: Number of documentation chunks to search (default 50 sufficient for direct queries)
+        include_references: Set True for related context, False for just direct matches
+        max_depth: Reference following depth (1=direct only, 3=default, 5=comprehensive context)
 
     Returns:
-        Formatted chunks with relevant API documentation, trimmed to fit within token limit
+        Precise documentation chunks with exact schema definitions, API details, and field specifications
     """
     return await searchAPI(
         query=query,
@@ -50,16 +69,42 @@ async def search_api(
 @mcp.tool()
 async def research_api(question: str) -> str:
     """
-    Research API documentation using intelligent ReAct agent.
+    WHEN TO USE: Complex schema analysis requiring multi-step traversal and synthesis.
+    Use for questions that need understanding relationships between multiple schemas,
+    resolving schema references, or building complete implementation strategies.
 
-    Provides comprehensive analysis and implementation guidance by automatically
-    searching documentation and synthesizing complete answers with examples.
+    PERFECT FOR COMPLEX SCHEMA ANALYSIS:
+    - Understanding entity hierarchies: "What do I need to create a Sponsored Display campaign?"
+      (traverses campaign → ad group → targeting → ad schemas)
+    - Schema reference resolution: "What creative types exist in Sponsored Display?"
+      (follows schema references across multiple definitions)
+    - Multi-API workflows: "How to set up complete product advertising with bidding strategies?"
+    - Cross-schema validation: "What fields are shared between Sponsored Products and Sponsored Display?"
+
+    EXAMPLES OF COMPLEX QUESTIONS:
+    - "What creative types exist in Sponsored Display?" (requires schema traversal)
+    - "Walk me through creating a complete Sponsored Brands campaign with video ads"
+    - "What bidding strategies are available across all advertising APIs?"
+    - "How do targeting options differ between Sponsored Products and Sponsored Display?"
+
+    DIFFERENCE FROM search_api:
+    - search_api: Direct field lookup in known schemas ("What fields are in Campaign schema?")
+    - research_api: Multi-schema analysis ("What schemas do I need for a complete campaign setup?")
+
+    INTELLIGENT CAPABILITIES:
+    - Automatically searches across multiple related schemas
+    - Follows schema references and $ref links
+    - Synthesizes information from scattered documentation
+    - Provides step-by-step implementation guidance
+    - Cross-references related APIs and endpoints
 
     Args:
-        question: Research question about API documentation
+        question: Complex research question requiring schema analysis (can be broad -
+                 the agent will break it down and traverse necessary schemas automatically)
 
     Returns:
-        Comprehensive answer with examples and implementation guidance
+        Comprehensive analysis with complete schema relationships, implementation steps,
+        cross-referenced examples, and synthesized guidance from multiple sources
     """
     return await research_api_question(question)
 
