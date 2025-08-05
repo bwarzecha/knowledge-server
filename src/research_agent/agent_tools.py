@@ -19,6 +19,7 @@ async def search_chunks_tool(
     include_references: bool = False,
     rerank: bool = True,
     search_context: Optional[str] = None,
+    exclude_chunks: str = "",
 ) -> dict:
     """Search API documentation chunks with intelligent LLM-based relevance filtering.
 
@@ -39,6 +40,7 @@ async def search_chunks_tool(
         include_references: Include reference IDs in response
         rerank: Enable LLM filtering for better results (default: True)
         search_context: Rich context about search intent for quality filtering
+        exclude_chunks: Comma-separated chunk IDs to exclude from results
 
     Examples:
         # Basic search
@@ -59,6 +61,15 @@ async def search_chunks_tool(
         f"file_filter={file_filter}, rerank={rerank}"
     )
 
+    # Parse exclude_chunks parameter
+    exclude_chunk_ids = []
+    if exclude_chunks.strip():
+        exclude_chunk_ids = [
+            chunk_id.strip()
+            for chunk_id in exclude_chunks.split(",")
+            if chunk_id.strip()
+        ]
+
     resources = get_shared_resources()
     api_context = generate_api_context()
 
@@ -71,9 +82,12 @@ async def search_chunks_tool(
         include_references=include_references,
         rerank=rerank,
         search_context=search_context,
+        exclude_chunk_ids=exclude_chunk_ids,
     )
 
-    logger.info(f"search_chunks_tool result: {result.total_found} chunks found in {result.search_time_ms:.1f}ms")
+    logger.info(
+        f"search_chunks_tool result: {result.total_found} chunks found in {result.search_time_ms:.1f}ms"
+    )
 
     # Log filtering stats if available
     if result.filtering_stats:
@@ -107,13 +121,17 @@ async def search_chunks_tool(
 
 
 @tool
-async def get_chunks_tool(chunk_ids: List[str], expand_depth: int = 3, max_total_chunks: int = 100) -> dict:
+async def get_chunks_tool(
+    chunk_ids: List[str], expand_depth: int = 3, max_total_chunks: int = 100
+) -> dict:
     """Retrieve specific chunks by ID with reference expansion.
 
     Use expand_depth=0 for quick lookups, expand_depth=3-5 for complete schemas,
     expand_depth=5+ for deep nested structures.
     """
-    logger.info(f"get_chunks_tool called: {len(chunk_ids)} chunk_ids, expand_depth={expand_depth}")
+    logger.info(
+        f"get_chunks_tool called: {len(chunk_ids)} chunk_ids, expand_depth={expand_depth}"
+    )
 
     resources = get_shared_resources()
 

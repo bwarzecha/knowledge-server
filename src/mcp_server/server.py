@@ -24,6 +24,7 @@ async def search_api(
     max_chunks: int = 50,
     include_references: bool = True,
     max_depth: int = 3,
+    exclude_chunks: str = "",
 ) -> str:
     """
     WHEN TO USE: Direct lookups for specific schema fields, endpoint details, or known API elements.
@@ -47,12 +48,30 @@ async def search_api(
     - "What do I need to create a Sponsored Display campaign?" (needs campaign + ad group + targeting + ad schemas)
     - "What creative types exist in Sponsored Display?" (requires traversing multiple schema references)
 
+    EXCLUDE_CHUNKS PARAMETER USAGE:
+    Use exclude_chunks to avoid getting the same documentation chunks in follow-up questions within the same conversation.
+
+    WHEN TO USE exclude_chunks:
+    - After receiving results from a previous search_api call in the same conversation
+    - When asking related but different questions about the same topic
+    - To get fresh, non-duplicate content for comprehensive coverage
+
+    HOW TO USE exclude_chunks:
+    1. First call: search_api("authentication methods") → Returns chunks: "auth_basic_001", "auth_oauth_002", "auth_token_003"
+    2. Follow-up call: search_api("authentication examples", exclude_chunks="auth_basic_001,auth_oauth_002,auth_token_003")
+    3. Next call: search_api("auth error handling", exclude_chunks="auth_basic_001,auth_oauth_002,auth_token_003,auth_examples_004")
+
+    EXTRACT CHUNK IDs FROM RESPONSES:
+    Look for chunk IDs in the response footer like: "Sources: 3 chunks" or in detailed responses.
+    Each chunk has an ID format like: schema_name_001, endpoint_post_campaigns_002, etc.
+
     Args:
         query: Specific search query (use exact schema names, field names, endpoint paths when known)
         max_response_length: Token limit for response (default 4000 works for most direct lookups)
         max_chunks: Number of documentation chunks to search (default 50 sufficient for direct queries)
         include_references: Set True for related context, False for just direct matches
         max_depth: Reference following depth (1=direct only, 3=default, 5=comprehensive context)
+        exclude_chunks: Comma-separated chunk IDs to exclude (prevents duplicate results in same conversation)
 
     Returns:
         Precise documentation chunks with exact schema definitions, API details, and field specifications
@@ -63,11 +82,12 @@ async def search_api(
         max_chunks=max_chunks,
         include_references=include_references,
         max_depth=max_depth,
+        exclude_chunks=exclude_chunks,
     )
 
 
 @mcp.tool()
-async def research_api(question: str) -> str:
+async def research_api(question: str, exclude_chunks: str = "") -> str:
     """
     WHEN TO USE: Complex schema analysis requiring multi-step traversal and synthesis.
     Use for questions that need understanding relationships between multiple schemas,
@@ -101,12 +121,13 @@ async def research_api(question: str) -> str:
     Args:
         question: Complex research question requiring schema analysis (can be broad -
                  the agent will break it down and traverse necessary schemas automatically)
+        exclude_chunks: Comma-separated chunk IDs to exclude (same as search_api - prevents duplicate results)
 
     Returns:
         Comprehensive analysis with complete schema relationships, implementation steps,
         cross-referenced examples, and synthesized guidance from multiple sources
     """
-    return await research_api_question(question)
+    return await research_api_question(question, exclude_chunks)
 
 
 def start_server(config: Config):

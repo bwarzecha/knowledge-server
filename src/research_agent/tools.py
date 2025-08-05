@@ -11,7 +11,8 @@ from langchain_aws import ChatBedrockConverse
 
 from ..cli.config import Config
 from ..vector_store.vector_store_manager import VectorStoreManager
-from .data_classes import ChunkSummary, FullChunk, RetrievalResults, SearchResults
+from .data_classes import (ChunkSummary, FullChunk, RetrievalResults,
+                           SearchResults)
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ async def searchChunks(
     include_references: bool = False,
     rerank: bool = True,
     search_context: Optional[str] = None,
+    exclude_chunk_ids: Optional[List[str]] = None,
 ) -> SearchResults:
     """
     Search for relevant chunks with optional LLM-based relevance filtering.
@@ -50,7 +52,9 @@ async def searchChunks(
     # Calculate search limit based on reranking strategy
     if rerank:
         search_limit = int(max_chunks * config.chunk_filtering_oversample_multiplier)
-        logger.info(f"Reranking enabled: searching for {search_limit} chunks, filtering to {max_chunks}")
+        logger.info(
+            f"Reranking enabled: searching for {search_limit} chunks, filtering to {max_chunks}"
+        )
     else:
         search_limit = max_chunks
         logger.info(f"Reranking disabled: searching for {search_limit} chunks directly")
@@ -121,6 +125,15 @@ async def searchChunks(
             relevance_score=relevance_score,
         )
         chunks.append(chunk_summary)
+
+    # Filter out excluded chunks
+    if exclude_chunk_ids:
+        exclude_set = set(exclude_chunk_ids)
+        original_count = len(chunks)
+        chunks = [chunk for chunk in chunks if chunk.chunk_id not in exclude_set]
+        excluded_count = original_count - len(chunks)
+        if excluded_count > 0:
+            logger.info(f"Excluded {excluded_count} chunks from search results")
 
     # Apply LLM-based filtering if enabled
     filtering_stats = None
@@ -238,7 +251,10 @@ async def getChunks(
                     expansion_queue.append((ref_id, 1))
 
         # Breadth-first expansion
-        while expansion_queue and len(requested_chunks) + len(expanded_chunks) < max_total_chunks:
+        while (
+            expansion_queue
+            and len(requested_chunks) + len(expanded_chunks) < max_total_chunks
+        ):
             current_id, depth = expansion_queue.pop(0)
 
             # Skip if already visited or depth exceeded
@@ -328,7 +344,11 @@ def generate_api_context(api_index_path: str = "data/api_index.json") -> str:
             for file_info in files:
                 file_name = file_info["file"]
                 # Extract description from text field if available
-                description = file_info.get("text", "").split("\n")[0] if file_info.get("text") else "API Documentation"
+                description = (
+                    file_info.get("text", "").split("\n")[0]
+                    if file_info.get("text")
+                    else "API Documentation"
+                )
                 lines.append(f"- {file_name}: {description}")
         else:
             # Old format with direct file mapping
@@ -477,7 +497,10 @@ async def _filter_and_expand_chunks(
     try:
         # Configure retry behavior at AWS SDK level for reranker
         aws_config = BotocoreConfig(
-            retries={"max_attempts": config.chunk_filtering_llm_retry_max_attempts, "mode": "standard"}
+            retries={
+                "max_attempts": config.chunk_filtering_llm_retry_max_attempts,
+                "mode": "standard",
+            }
         )
 
         # Create dedicated re-ranker LLM model with separate config
@@ -489,7 +512,9 @@ async def _filter_and_expand_chunks(
         )
 
         # Call LLM for relevance assessment
-        logger.info(f"Calling LLM to filter {len(chunks)} chunks for query: {query[:50]}...")
+        logger.info(
+            f"Calling LLM to filter {len(chunks)} chunks for query: {query[:50]}..."
+        )
         response = await model.ainvoke([{"role": "user", "content": prompt}])
 
         # Parse LLM response to get chunk decisions by ID
@@ -511,7 +536,9 @@ async def _filter_and_expand_chunks(
             "llm_intelligence_enabled": True,
             "original_count": len(chunks),
             "filtered_count": len(filtered_chunks),
-            "reduction_ratio": 1.0 - (len(filtered_chunks) / len(chunks)) if chunks else 0.0,
+            "reduction_ratio": (
+                1.0 - (len(filtered_chunks) / len(chunks)) if chunks else 0.0
+            ),
             "decisions": chunk_decisions,
             "processing_time_ms": filtering_time,
             "fallback_used": False,
@@ -533,7 +560,9 @@ async def _filter_and_expand_chunks(
             "llm_intelligence_enabled": True,
             "original_count": len(chunks),
             "filtered_count": len(fallback_chunks),
-            "reduction_ratio": 1.0 - (len(fallback_chunks) / len(chunks)) if chunks else 0.0,
+            "reduction_ratio": (
+                1.0 - (len(fallback_chunks) / len(chunks)) if chunks else 0.0
+            ),
             "decisions": {},
             "processing_time_ms": 0,
             "fallback_used": True,

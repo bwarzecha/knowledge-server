@@ -2,7 +2,7 @@
 
 import logging
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from .context_assembler import ContextAssembler
 from .data_classes import KnowledgeContext, RetrieverConfig
@@ -44,6 +44,7 @@ class KnowledgeRetriever:
         include_references: bool = True,
         max_depth: Optional[int] = None,
         filters: Optional[Dict[str, Any]] = None,
+        exclude_chunk_ids: Optional[List[str]] = None,
     ) -> KnowledgeContext:
         """
         Main retrieval interface implementing two-stage pipeline.
@@ -55,6 +56,7 @@ class KnowledgeRetriever:
             include_references: Whether to expand references (default: True)
             max_depth: Override config for reference expansion depth
             filters: Optional metadata filters for initial search
+            exclude_chunk_ids: List of chunk IDs to exclude from results
 
         Returns:
             Complete KnowledgeContext with primary and referenced chunks
@@ -77,11 +79,24 @@ class KnowledgeRetriever:
         primary_chunks = self._execute_semantic_search(query, primary_limit, filters)
         search_time_ms = (time.time() - search_start) * 1000
 
+        # Filter out excluded chunks
+        if exclude_chunk_ids:
+            exclude_set = set(exclude_chunk_ids)
+            original_count = len(primary_chunks)
+            primary_chunks = [
+                chunk for chunk in primary_chunks if chunk.id not in exclude_set
+            ]
+            excluded_count = original_count - len(primary_chunks)
+            if excluded_count > 0:
+                logger.info(f"Excluded {excluded_count} chunks from primary results")
+
         if not primary_chunks:
-            logger.info("No primary chunks found for query")
+            logger.info("No primary chunks found for query after filtering")
             return self._create_empty_context(query)
 
-        logger.info(f"Found {len(primary_chunks)} primary chunks in {search_time_ms:.1f}ms")
+        logger.info(
+            f"Found {len(primary_chunks)} primary chunks in {search_time_ms:.1f}ms"
+        )
 
         # Stage 2: Reference Expansion (if enabled)
         referenced_chunks = []
@@ -90,11 +105,29 @@ class KnowledgeRetriever:
         if include_references:
             max_references = total_limit - len(primary_chunks)
             if max_references > 0:
-                referenced_chunks, expansion_stats = self.reference_expander.expand_references(
-                    primary_chunks=primary_chunks,
-                    max_depth=depth_limit,
-                    max_total=max_references,
+                referenced_chunks, expansion_stats = (
+                    self.reference_expander.expand_references(
+                        primary_chunks=primary_chunks,
+                        max_depth=depth_limit,
+                        max_total=max_references,
+                    )
                 )
+
+                # Filter out excluded chunks from referenced results
+                if exclude_chunk_ids:
+                    exclude_set = set(exclude_chunk_ids)
+                    original_ref_count = len(referenced_chunks)
+                    referenced_chunks = [
+                        chunk
+                        for chunk in referenced_chunks
+                        if chunk.id not in exclude_set
+                    ]
+                    excluded_ref_count = original_ref_count - len(referenced_chunks)
+                    if excluded_ref_count > 0:
+                        logger.info(
+                            f"Excluded {excluded_ref_count} chunks from referenced results"
+                        )
+
                 logger.info(f"Expanded to {len(referenced_chunks)} referenced chunks")
             else:
                 logger.info("Skipping reference expansion - primary chunks at limit")
@@ -131,10 +164,14 @@ class KnowledgeRetriever:
 
         return context
 
-    def _execute_semantic_search(self, query: str, limit: int, filters: Optional[Dict[str, Any]]) -> list:
+    def _execute_semantic_search(
+        self, query: str, limit: int, filters: Optional[Dict[str, Any]]
+    ) -> list:
         """Execute semantic search using Vector Store Manager."""
         try:
-            results = self.vector_store.search(query=query, limit=limit, filters=filters)
+            results = self.vector_store.search(
+                query=query, limit=limit, filters=filters
+            )
 
             logger.debug(f"Semantic search returned {len(results)} results")
             return results

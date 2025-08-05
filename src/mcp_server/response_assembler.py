@@ -19,6 +19,7 @@ class ResponseAssembler:
         context: KnowledgeContext,
         max_response_length: int = 4000,
         format_style: str = "detailed",
+        chunk_limit_mode: str = "token_based",  # "token_based" or "count_based"
     ) -> str:
         """
         Assemble chunks into formatted response within length limit.
@@ -27,6 +28,7 @@ class ResponseAssembler:
             context: KnowledgeContext with priority-ordered chunks
             max_response_length: Maximum response length in tokens
             format_style: Response format ("detailed", "summary", "raw")
+            chunk_limit_mode: "token_based" respects token limits, "count_based" includes all chunks
 
         Returns:
             Formatted response trimmed to fit within max_response_length
@@ -39,13 +41,23 @@ class ResponseAssembler:
 
         # Build response incrementally, checking length
         if format_style == "detailed":
-            return self._assemble_detailed(context, all_chunks, max_response_length)
+            return self._assemble_detailed(
+                context, all_chunks, max_response_length, chunk_limit_mode
+            )
         elif format_style == "summary":
-            return self._assemble_summary(context, all_chunks, max_response_length)
+            return self._assemble_summary(
+                context, all_chunks, max_response_length, chunk_limit_mode
+            )
         else:  # raw
-            return self._assemble_raw(all_chunks, max_response_length)
+            return self._assemble_raw(all_chunks, max_response_length, chunk_limit_mode)
 
-    def _assemble_detailed(self, context: KnowledgeContext, chunks: List[Chunk], max_length: int) -> str:
+    def _assemble_detailed(
+        self,
+        context: KnowledgeContext,
+        chunks: List[Chunk],
+        max_length: int,
+        chunk_limit_mode: str = "token_based",
+    ) -> str:
         """Assemble detailed response with metadata."""
         response_parts = [
             f'Based on your query: "{context.query}"\n',
@@ -62,27 +74,43 @@ class ResponseAssembler:
         for i, chunk in enumerate(chunks, 1):
             chunk_section = self._format_chunk_detailed(i, chunk)
 
-            # Check if we can fit this chunk
-            current_content = "\n".join(response_parts + [chunk_section])
-            if self._count_tokens(current_content) <= available_tokens:
+            if chunk_limit_mode == "count_based":
+                # Include all chunks regardless of token count
                 response_parts.append(chunk_section)
                 response_parts.append("")  # Empty line
                 included_chunks += 1
             else:
-                break
+                # Token-based limiting (original behavior)
+                current_content = "\n".join(response_parts + [chunk_section])
+                if self._count_tokens(current_content) <= available_tokens:
+                    response_parts.append(chunk_section)
+                    response_parts.append("")  # Empty line
+                    included_chunks += 1
+                else:
+                    break
 
         # Add truncation notice if needed
         if included_chunks < len(chunks):
             truncated = len(chunks) - included_chunks
-            response_parts.append(f"... (truncated {truncated} additional chunks to fit response limit)")
+            response_parts.append(
+                f"... (truncated {truncated} additional chunks to fit response limit)"
+            )
             response_parts.append("")
 
         response_parts.append(footer)
         return "\n".join(response_parts)
 
-    def _assemble_summary(self, context: KnowledgeContext, chunks: List[Chunk], max_length: int) -> str:
+    def _assemble_summary(
+        self,
+        context: KnowledgeContext,
+        chunks: List[Chunk],
+        max_length: int,
+        chunk_limit_mode: str = "token_based",
+    ) -> str:
         """Assemble concise summary response."""
-        response_parts = [f'Found {len(chunks)} relevant chunks for: "{context.query}"\n']
+        response_parts = [
+            f'Found {len(chunks)} relevant chunks for: "{context.query}"\n'
+        ]
 
         # Reserve space for footer
         footer = self._build_footer(context)
@@ -94,32 +122,46 @@ class ResponseAssembler:
         for chunk in chunks:
             chunk_summary = f"• {chunk.id}: {chunk.document[:100]}..."
 
-            current_content = "\n".join(response_parts + [chunk_summary])
-            if self._count_tokens(current_content) <= available_tokens:
+            if chunk_limit_mode == "count_based":
                 response_parts.append(chunk_summary)
                 included_chunks += 1
             else:
-                break
+                current_content = "\n".join(response_parts + [chunk_summary])
+                if self._count_tokens(current_content) <= available_tokens:
+                    response_parts.append(chunk_summary)
+                    included_chunks += 1
+                else:
+                    break
 
         if included_chunks < len(chunks):
-            response_parts.append(f"... (showing {included_chunks}/{len(chunks)} chunks)")
+            response_parts.append(
+                f"... (showing {included_chunks}/{len(chunks)} chunks)"
+            )
 
         response_parts.append("")
         response_parts.append(footer)
         return "\n".join(response_parts)
 
-    def _assemble_raw(self, chunks: List[Chunk], max_length: int) -> str:
+    def _assemble_raw(
+        self,
+        chunks: List[Chunk],
+        max_length: int,
+        chunk_limit_mode: str = "token_based",
+    ) -> str:
         """Assemble raw chunk content only."""
         response_parts = []
 
         for chunk in chunks:
             chunk_content = f"=== {chunk.id} ===\n{chunk.document}\n"
 
-            current_content = "\n".join(response_parts + [chunk_content])
-            if self._count_tokens(current_content) <= max_length:
+            if chunk_limit_mode == "count_based":
                 response_parts.append(chunk_content)
             else:
-                break
+                current_content = "\n".join(response_parts + [chunk_content])
+                if self._count_tokens(current_content) <= max_length:
+                    response_parts.append(chunk_content)
+                else:
+                    break
 
         return "\n".join(response_parts)
 

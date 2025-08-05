@@ -21,7 +21,10 @@ def create_research_agent():
 
     # Configure retry behavior at AWS SDK level
     aws_config = BotocoreConfig(
-        retries={"max_attempts": config.research_agent_llm_retry_max_attempts, "mode": "standard"}
+        retries={
+            "max_attempts": config.research_agent_llm_retry_max_attempts,
+            "mode": "standard",
+        }
     )
 
     # Create Bedrock model with configurable model and token limit
@@ -118,13 +121,20 @@ EVERY configuration option. When in doubt, include MORE detail, not less.""",
     )
 
 
-async def research_api_question(question: str) -> str:
+async def research_api_question(question: str, exclude_chunks: str = "") -> str:
     """Research API documentation using ReAct agent."""
     logger.info(f"Starting research for question: {question[:100]}...")
 
+    # If exclude_chunks provided, add context to the agent about excluding chunks
+    full_question = question
+    if exclude_chunks.strip():
+        full_question = f"{question}\n\nIMPORTANT: Exclude these chunk IDs from all search results: {exclude_chunks}"
+
     agent = create_research_agent()
 
-    result = await agent.ainvoke({"messages": [{"role": "user", "content": question}]})
+    result = await agent.ainvoke(
+        {"messages": [{"role": "user", "content": full_question}]}
+    )
 
     # Count tool calls and iterations
     messages = result["messages"]
@@ -136,8 +146,12 @@ async def research_api_question(question: str) -> str:
             tool_calls += len(msg.tool_calls)
             iterations += 1
             for tool_call in msg.tool_calls:
-                logger.info(f"Tool called: {tool_call['name']} with args: {tool_call['args']}")
+                logger.info(
+                    f"Tool called: {tool_call['name']} with args: {tool_call['args']}"
+                )
 
-    logger.info(f"Research completed: {iterations} iterations, {tool_calls} tool calls, {len(messages)} total messages")
+    logger.info(
+        f"Research completed: {iterations} iterations, {tool_calls} tool calls, {len(messages)} total messages"
+    )
 
     return result["messages"][-1].content
