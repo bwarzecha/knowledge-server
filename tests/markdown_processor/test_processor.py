@@ -250,7 +250,9 @@ def test_show_improved_sample_output():
     nav_summary = processor.get_navigation_summary(chunks)
     print("\n--- Navigation Summary ---")
     print(f"Total relationships: {nav_summary['total_relationships']}")
-    print(f"Previous/Next links: {nav_summary['previous_links']}/{nav_summary['next_links']}")
+    print(
+        f"Previous/Next links: {nav_summary['previous_links']}/{nav_summary['next_links']}"
+    )
     print(f"Parent links: {nav_summary['parent_links']}")
     print(f"Child relationships: {nav_summary['child_relationships']}")
 

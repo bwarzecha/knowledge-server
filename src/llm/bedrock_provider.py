@@ -57,7 +57,9 @@ class BedrockLLMProvider(LLMProvider):
             self._initialize_client()
         return self._available or False
 
-    def generate(self, prompt: str, temperature: float = 0.2, max_tokens: int = 200) -> str:
+    def generate(
+        self, prompt: str, temperature: float = 0.2, max_tokens: int = 200
+    ) -> str:
         """Generate text using Bedrock."""
         if not self.is_available():
             raise RuntimeError("Bedrock is not available")

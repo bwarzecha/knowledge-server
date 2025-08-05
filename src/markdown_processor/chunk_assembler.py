@@ -19,9 +19,13 @@ class ChunkAssembler:
         """Recursively ensure all values in an object are JSON serializable and ChromaDB compatible."""
         if isinstance(obj, dict):
             # Convert None values to empty strings but keep the keys
-            return {key: self._ensure_json_serializable(value) for key, value in obj.items()}
+            return {
+                key: self._ensure_json_serializable(value) for key, value in obj.items()
+            }
         elif isinstance(obj, list):
-            return [self._ensure_json_serializable(item) for item in obj if item is not None]
+            return [
+                self._ensure_json_serializable(item) for item in obj if item is not None
+            ]
         elif obj is None:
             return ""  # Convert None to empty string for ChromaDB compatibility
         else:
@@ -55,10 +59,14 @@ class ChunkAssembler:
         chunks = []
 
         # Build navigation metadata for all sections
-        navigation_data = self.navigation_builder.build_navigation(sections, source_file or "unknown")
+        navigation_data = self.navigation_builder.build_navigation(
+            sections, source_file or "unknown"
+        )
 
         # Analyze document context once
-        document_context = self.content_analyzer.analyze_document_context(frontmatter, source_file)
+        document_context = self.content_analyzer.analyze_document_context(
+            frontmatter, source_file
+        )
 
         # Process each section
         for i, section in enumerate(sections):
@@ -109,7 +117,9 @@ class ChunkAssembler:
             nav_meta = nav_meta.__dict__
 
         # Analyze content
-        content_meta = self.content_analyzer.analyze_content(section, frontmatter, source_file)
+        content_meta = self.content_analyzer.analyze_content(
+            section, frontmatter, source_file
+        )
 
         # Build complete metadata
         metadata = self.content_analyzer.enrich_section_metadata(
@@ -145,7 +155,9 @@ class ChunkAssembler:
 
         return chunk
 
-    def _generate_chunk_id(self, section: SectionData, source_file: str, index: int) -> str:
+    def _generate_chunk_id(
+        self, section: SectionData, source_file: str, index: int
+    ) -> str:
         """
         Generate chunk ID for a section.
 
@@ -216,7 +228,9 @@ class ChunkAssembler:
 
             # Validate metadata
             if "metadata" in chunk:
-                metadata_errors = self.content_analyzer.validate_metadata(chunk["metadata"])
+                metadata_errors = self.content_analyzer.validate_metadata(
+                    chunk["metadata"]
+                )
                 for error in metadata_errors:
                     errors.append(f"Chunk {chunk_id or i} metadata error: {error}")
 
@@ -226,7 +240,9 @@ class ChunkAssembler:
 
         return errors
 
-    def _validate_navigation_consistency(self, chunks: List[Dict[str, Any]]) -> List[str]:
+    def _validate_navigation_consistency(
+        self, chunks: List[Dict[str, Any]]
+    ) -> List[str]:
         """
         Validate navigation relationships between chunks.
 
@@ -246,27 +262,37 @@ class ChunkAssembler:
             # Check previous/next references
             prev_chunk = metadata.get("previous_chunk")
             if prev_chunk and prev_chunk not in chunk_ids:
-                errors.append(f"Chunk {chunk_id} references non-existent previous chunk: {prev_chunk}")
+                errors.append(
+                    f"Chunk {chunk_id} references non-existent previous chunk: {prev_chunk}"
+                )
 
             next_chunk = metadata.get("next_chunk")
             if next_chunk and next_chunk not in chunk_ids:
-                errors.append(f"Chunk {chunk_id} references non-existent next chunk: {next_chunk}")
+                errors.append(
+                    f"Chunk {chunk_id} references non-existent next chunk: {next_chunk}"
+                )
 
             # Check parent/child references
             parent_section = metadata.get("parent_section")
             if parent_section and parent_section not in chunk_ids:
-                errors.append(f"Chunk {chunk_id} references non-existent parent: {parent_section}")
+                errors.append(
+                    f"Chunk {chunk_id} references non-existent parent: {parent_section}"
+                )
 
             child_sections = metadata.get("child_sections", [])
             for child_id in child_sections:
                 if child_id not in chunk_ids:
-                    errors.append(f"Chunk {chunk_id} references non-existent child: {child_id}")
+                    errors.append(
+                        f"Chunk {chunk_id} references non-existent child: {child_id}"
+                    )
 
             # Check sibling references
             sibling_sections = metadata.get("sibling_sections", [])
             for sibling_id in sibling_sections:
                 if sibling_id not in chunk_ids:
-                    errors.append(f"Chunk {chunk_id} references non-existent sibling: {sibling_id}")
+                    errors.append(
+                        f"Chunk {chunk_id} references non-existent sibling: {sibling_id}"
+                    )
 
         return errors
 

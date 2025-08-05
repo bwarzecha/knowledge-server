@@ -89,7 +89,9 @@ class ReferenceScanner:
             "internal_links": self._deduplicate_links(anchor_links),
             "cross_doc_refs": self._deduplicate_links(cross_doc_refs),
             "external_links": self._deduplicate_links(external_links),
-            "all_links": self._deduplicate_links(internal_links + cross_doc_refs + external_links + anchor_links),
+            "all_links": self._deduplicate_links(
+                internal_links + cross_doc_refs + external_links + anchor_links
+            ),
         }
 
     def _classify_link(self, url: str) -> str:
@@ -148,7 +150,9 @@ class ReferenceScanner:
 
         return unique_urls
 
-    def extract_cross_document_references(self, content: str, source_file: str = None) -> List[str]:
+    def extract_cross_document_references(
+        self, content: str, source_file: str = None
+    ) -> List[str]:
         """
         Extract cross-document references and convert to chunk IDs.
 

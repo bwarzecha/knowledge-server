@@ -2,14 +2,11 @@
 
 import pytest
 
-from src.vector_store.embedding_utils import (
-    encode_documents,
-    encode_query,
-    get_token_count,
-    load_embedding_model,
-    trim_text_to_token_limit,
-    validate_embedding_dimensions,
-)
+from src.vector_store.embedding_utils import (encode_documents, encode_query,
+                                              get_token_count,
+                                              load_embedding_model,
+                                              trim_text_to_token_limit,
+                                              validate_embedding_dimensions)
 
 
 class TestEmbeddingUtilsReal:
@@ -21,7 +18,9 @@ class TestEmbeddingUtilsReal:
         # Use all-MiniLM-L6-v2 - it's small (80MB), fast, and supports up to 256 tokens
         model_name = "sentence-transformers/all-MiniLM-L6-v2"
         try:
-            return load_embedding_model(model_name, device="cpu")  # Use CPU for reliability
+            return load_embedding_model(
+                model_name, device="cpu"
+            )  # Use CPU for reliability
         except Exception as e:
             pytest.skip(f"Could not load embedding model {model_name}: {e}")
 
@@ -85,15 +84,22 @@ class TestEmbeddingUtilsReal:
         prog_emb = np.array(embeddings[2])
 
         # Cosine similarity between cat and dog should be higher than cat and programming
-        cat_dog_sim = np.dot(cat_emb, dog_emb) / (np.linalg.norm(cat_emb) * np.linalg.norm(dog_emb))
-        cat_prog_sim = np.dot(cat_emb, prog_emb) / (np.linalg.norm(cat_emb) * np.linalg.norm(prog_emb))
+        cat_dog_sim = np.dot(cat_emb, dog_emb) / (
+            np.linalg.norm(cat_emb) * np.linalg.norm(dog_emb)
+        )
+        cat_prog_sim = np.dot(cat_emb, prog_emb) / (
+            np.linalg.norm(cat_emb) * np.linalg.norm(prog_emb)
+        )
 
         assert cat_dog_sim > cat_prog_sim
 
     def test_encode_documents_with_token_limit(self, embedding_model):
         """Test document encoding with token limiting."""
         # Create a long document that exceeds token limit
-        long_text = "This is a repeated sentence about machine learning and artificial intelligence. " * 20
+        long_text = (
+            "This is a repeated sentence about machine learning and artificial intelligence. "
+            * 20
+        )
         texts = [long_text]
 
         # Encode with token limit

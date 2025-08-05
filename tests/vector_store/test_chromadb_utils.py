@@ -7,14 +7,9 @@ from pathlib import Path
 import pytest
 
 from src.vector_store.chromadb_utils import (
-    SentenceTransformerEmbeddingFunction,
-    add_chunks_to_collection,
-    create_chromadb_client,
-    create_collection,
-    get_chunks_by_ids,
-    get_collection_info,
-    search_collection,
-)
+    SentenceTransformerEmbeddingFunction, add_chunks_to_collection,
+    create_chromadb_client, create_collection, get_chunks_by_ids,
+    get_collection_info, search_collection)
 from src.vector_store.embedding_utils import load_embedding_model
 
 
@@ -116,7 +111,9 @@ class TestChromaDBUtils:
         create_collection(client, "reset_test", embedding_function)
 
         # Create with reset - should delete and recreate
-        collection2 = create_collection(client, "reset_test", embedding_function, reset=True)
+        collection2 = create_collection(
+            client, "reset_test", embedding_function, reset=True
+        )
         assert collection2.name == "reset_test"
 
     def test_add_chunks_to_collection(self, collection, sample_chunks):
@@ -163,7 +160,9 @@ class TestChromaDBUtils:
         add_chunks_to_collection(collection, sample_chunks)
 
         # Search for user-related content
-        results = search_collection(collection, "user information and profile data", embedding_model, limit=3)
+        results = search_collection(
+            collection, "user information and profile data", embedding_model, limit=3
+        )
 
         assert len(results) <= 3
         assert all("id" in result for result in results)
@@ -177,7 +176,9 @@ class TestChromaDBUtils:
             assert results[0]["rank"] == 1
             assert results[1]["rank"] == 2
 
-    def test_search_collection_with_filters(self, collection, sample_chunks, embedding_model):
+    def test_search_collection_with_filters(
+        self, collection, sample_chunks, embedding_model
+    ):
         """Test search with metadata filters."""
         # First add chunks
         add_chunks_to_collection(collection, sample_chunks)
@@ -195,7 +196,9 @@ class TestChromaDBUtils:
         for result in results:
             assert result["metadata"]["element_type"] == "component"
 
-    def test_search_collection_empty_query(self, collection, sample_chunks, embedding_model):
+    def test_search_collection_empty_query(
+        self, collection, sample_chunks, embedding_model
+    ):
         """Test search with empty query."""
         add_chunks_to_collection(collection, sample_chunks)
 
@@ -220,21 +223,27 @@ class TestChromaDBUtils:
 
     def test_embedding_function(self, embedding_model):
         """Test custom embedding function."""
-        embedding_func = SentenceTransformerEmbeddingFunction(embedding_model, max_tokens=100)
+        embedding_func = SentenceTransformerEmbeddingFunction(
+            embedding_model, max_tokens=100
+        )
 
         texts = ["test document", "another document"]
         embeddings = embedding_func(texts)
 
         assert len(embeddings) == len(texts)
         # ChromaDB normalizes embeddings to numpy arrays, so expect numpy arrays
-        assert all(hasattr(emb, "shape") for emb in embeddings)  # numpy arrays have shape
+        assert all(
+            hasattr(emb, "shape") for emb in embeddings
+        )  # numpy arrays have shape
         assert all(len(emb) > 0 for emb in embeddings)
 
     def test_batch_processing(self, collection, embedding_model):
         """Test batch processing with multiple batches."""
         # Create many chunks to test batching
         chunks = []
-        for i in range(25):  # More than default batch size of 100, but let's use smaller batch
+        for i in range(
+            25
+        ):  # More than default batch size of 100, but let's use smaller batch
             chunks.append(
                 {
                     "id": f"test.json:item_{i}",
@@ -255,5 +264,7 @@ class TestChromaDBUtils:
         assert info["count"] == len(chunks)
 
         # Test search works across all chunks
-        results = search_collection(collection, "test document", embedding_model, limit=5)
+        results = search_collection(
+            collection, "test document", embedding_model, limit=5
+        )
         assert len(results) == 5

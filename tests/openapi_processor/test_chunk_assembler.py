@@ -146,7 +146,9 @@ class TestChunkAssembler:
                 "path": "/pets",
                 "method": "post",
                 "ref_ids": {
-                    "api.json:components/requestBodies/PetBody": ["api.json:components/schemas/Pet"],
+                    "api.json:components/requestBodies/PetBody": [
+                        "api.json:components/schemas/Pet"
+                    ],
                     "api.json:components/responses/PetResponse": [],
                     "api.json:components/responses/ErrorResponse": [],
                 },

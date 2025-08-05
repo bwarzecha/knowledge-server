@@ -29,10 +29,14 @@ class MarkdownProcessor:
         """
         # Validate token limit
         if max_tokens > 8000:
-            logger.warning(f"Token limit {max_tokens} exceeds recommended maximum of 8000, capping at 8000")
+            logger.warning(
+                f"Token limit {max_tokens} exceeds recommended maximum of 8000, capping at 8000"
+            )
             max_tokens = 8000
         elif max_tokens < 100:
-            logger.warning(f"Token limit {max_tokens} too small, setting minimum of 100")
+            logger.warning(
+                f"Token limit {max_tokens} too small, setting minimum of 100"
+            )
             max_tokens = 100
         # Initialize all components
         self.scanner = DirectoryScanner()
@@ -100,7 +104,9 @@ class MarkdownProcessor:
 
         return all_chunks
 
-    def process_file(self, file_path: Union[str, Path], relative_path: str = None) -> List[Dict[str, Any]]:
+    def process_file(
+        self, file_path: Union[str, Path], relative_path: str = None
+    ) -> List[Dict[str, Any]]:
         """
         Process a single markdown file through phases 2-5.
 
@@ -127,14 +133,18 @@ class MarkdownProcessor:
         headers = self.header_extractor.extract_headers(parse_result.content)
         logger.debug(f"Extracted {len(headers)} headers from {file_path}")
 
-        sections = self.section_splitter.split_content(parse_result.content, headers, parse_result.frontmatter)
+        sections = self.section_splitter.split_content(
+            parse_result.content, headers, parse_result.frontmatter
+        )
         logger.debug(f"Created {len(sections)} sections from {file_path}")
 
         # Phase 4: Reference resolution and navigation building
         # (References are scanned per-section in chunk assembly)
 
         # Phase 5: Final assembly and output
-        chunks = self.chunk_assembler.assemble_chunks(sections, parse_result.frontmatter, relative_path)
+        chunks = self.chunk_assembler.assemble_chunks(
+            sections, parse_result.frontmatter, relative_path
+        )
 
         logger.debug(f"Generated {len(chunks)} chunks from {file_path}")
         return chunks
@@ -317,7 +327,11 @@ class MarkdownProcessor:
             total_siblings += len(siblings)
 
         return {
-            "total_relationships": total_prev + total_next + total_parent + total_children + total_siblings,
+            "total_relationships": total_prev
+            + total_next
+            + total_parent
+            + total_children
+            + total_siblings,
             "previous_links": total_prev,
             "next_links": total_next,
             "parent_links": total_parent,

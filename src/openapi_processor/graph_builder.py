@@ -14,7 +14,9 @@ class GraphBuilder:
         self.scanner = ReferenceScanner()
         self.resolver = ReferenceResolver()
 
-    def build_reference_graph(self, elements: List[ExtractedElement]) -> List[ExtractedElement]:
+    def build_reference_graph(
+        self, elements: List[ExtractedElement]
+    ) -> List[ExtractedElement]:
         """
         Build hierarchical ref_ids and referenced_by lists.
 
@@ -52,11 +54,15 @@ class GraphBuilder:
 
         for ref in refs:
             # Convert $ref to chunk ID
-            chunk_id = self.resolver.resolve_ref_to_chunk_id(ref, element.metadata["source_file"])
+            chunk_id = self.resolver.resolve_ref_to_chunk_id(
+                ref, element.metadata["source_file"]
+            )
 
             if chunk_id and chunk_id in element_lookup:
                 # Get dependencies of the referenced element
-                dependencies = self._get_dependencies(chunk_id, element_lookup, visited=set())
+                dependencies = self._get_dependencies(
+                    chunk_id, element_lookup, visited=set()
+                )
                 ref_ids[chunk_id] = dependencies
 
         return ref_ids
@@ -78,21 +84,36 @@ class GraphBuilder:
         refs = self.scanner.find_references(element.content)
 
         for ref in refs:
-            dep_chunk_id = self.resolver.resolve_ref_to_chunk_id(ref, element.metadata["source_file"])
-            if dep_chunk_id and dep_chunk_id in element_lookup and dep_chunk_id not in visited:
+            dep_chunk_id = self.resolver.resolve_ref_to_chunk_id(
+                ref, element.metadata["source_file"]
+            )
+            if (
+                dep_chunk_id
+                and dep_chunk_id in element_lookup
+                and dep_chunk_id not in visited
+            ):
                 dependencies.append(dep_chunk_id)
                 # Add transitive dependencies
-                transitive_deps = self._get_dependencies(dep_chunk_id, element_lookup, visited.copy())
+                transitive_deps = self._get_dependencies(
+                    dep_chunk_id, element_lookup, visited.copy()
+                )
                 dependencies.extend(transitive_deps)
 
         return list(set(dependencies))  # Remove duplicates
 
-    def _populate_referenced_by(self, element: ExtractedElement, element_lookup: Dict[str, ExtractedElement]) -> None:
+    def _populate_referenced_by(
+        self, element: ExtractedElement, element_lookup: Dict[str, ExtractedElement]
+    ) -> None:
         """Populate referenced_by lists based on ref_ids."""
         ref_ids = element.metadata.get("ref_ids", {})
 
         for referenced_chunk_id in ref_ids.keys():
             if referenced_chunk_id in element_lookup:
                 referenced_element = element_lookup[referenced_chunk_id]
-                if element.element_id not in referenced_element.metadata["referenced_by"]:
-                    referenced_element.metadata["referenced_by"].append(element.element_id)
+                if (
+                    element.element_id
+                    not in referenced_element.metadata["referenced_by"]
+                ):
+                    referenced_element.metadata["referenced_by"].append(
+                        element.element_id
+                    )

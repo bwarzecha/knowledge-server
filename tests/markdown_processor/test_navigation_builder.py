@@ -77,7 +77,9 @@ class TestNavigationBuilder:
         chunk_ids = list(navigation.keys())
 
         # All chunk IDs should be unique
-        assert len(chunk_ids) == len(set(chunk_ids)), f"Duplicate chunk IDs found: {chunk_ids}"
+        assert len(chunk_ids) == len(
+            set(chunk_ids)
+        ), f"Duplicate chunk IDs found: {chunk_ids}"
 
         # Verify we have 4 sections
         assert len(chunk_ids) == 4

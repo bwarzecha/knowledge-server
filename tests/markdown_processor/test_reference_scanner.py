@@ -2,7 +2,8 @@
 
 from pathlib import Path
 
-from src.markdown_processor.reference_scanner import LinkReference, ReferenceScanner
+from src.markdown_processor.reference_scanner import (LinkReference,
+                                                      ReferenceScanner)
 
 
 class TestReferenceScanner:
@@ -57,7 +58,9 @@ class TestReferenceScanner:
 
         for url, expected_type in test_cases:
             result = scanner._classify_link(url)
-            assert result == expected_type, f"URL {url} should be {expected_type}, got {result}"
+            assert (
+                result == expected_type
+            ), f"URL {url} should be {expected_type}, got {result}"
 
     def test_scan_markdown_links(self):
         """Test scanning various markdown link formats."""
@@ -83,9 +86,13 @@ And another [external](http://another.com) link.
         refs = scanner.scan_references(content)
 
         # Should categorize correctly
-        assert len(refs["external_links"]) >= 3  # https://example.com, https://autolink.com, http://another.com
+        assert (
+            len(refs["external_links"]) >= 3
+        )  # https://example.com, https://autolink.com, http://another.com
         assert len(refs["internal_links"]) >= 1  # #section-1
-        assert len(refs["cross_doc_refs"]) >= 3  # ../other.md, guide.md#installation, ./docs/readme.md
+        assert (
+            len(refs["cross_doc_refs"]) >= 3
+        )  # ../other.md, guide.md#installation, ./docs/readme.md
 
     def test_extract_cross_document_references(self):
         """Test extraction of cross-document references with chunk ID conversion."""
@@ -233,7 +240,9 @@ Final paragraph.
             else:
                 result = scanner._convert_to_chunk_id(ref, None)
 
-            assert result == expected, f"Reference {ref} should convert to {expected}, got {result}"
+            assert (
+                result == expected
+            ), f"Reference {ref} should convert to {expected}, got {result}"
 
     def test_anchor_slugification(self):
         """Test anchor text slugification."""

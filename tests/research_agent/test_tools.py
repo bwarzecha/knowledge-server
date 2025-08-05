@@ -9,7 +9,8 @@ import pytest
 
 from src.cli.config import Config
 from src.openapi_processor.processor import OpenAPIProcessor
-from src.research_agent.tools import generate_api_context, getChunks, searchChunks
+from src.research_agent.tools import (generate_api_context, getChunks,
+                                      searchChunks)
 from src.vector_store.vector_store_manager import VectorStoreManager
 
 
@@ -233,7 +234,9 @@ class TestResearchAgentTools:
         chunk_ids = [chunk.chunk_id for chunk in search_results.chunks[:2]]
 
         # Execute
-        actual = await getChunks(vector_store=vector_store, chunk_ids=chunk_ids, expand_depth=0)
+        actual = await getChunks(
+            vector_store=vector_store, chunk_ids=chunk_ids, expand_depth=0
+        )
 
         # Expected
         expected = {
@@ -350,7 +353,10 @@ class TestResearchAgentTools:
 
         # Assert
         assert actual.total_chunks <= expected["max_total"]
-        assert len(actual.requested_chunks) + len(actual.expanded_chunks) <= expected["max_total"]
+        assert (
+            len(actual.requested_chunks) + len(actual.expanded_chunks)
+            <= expected["max_total"]
+        )
 
     @pytest.mark.asyncio
     async def test_get_chunks_empty_input(self, temp_environment):
@@ -359,7 +365,9 @@ class TestResearchAgentTools:
         vector_store = temp_environment["vector_store"]
 
         # Execute
-        actual = await getChunks(vector_store=vector_store, chunk_ids=[], expand_depth=0)
+        actual = await getChunks(
+            vector_store=vector_store, chunk_ids=[], expand_depth=0
+        )
 
         # Expected
         expected = {
@@ -422,8 +430,12 @@ class TestResearchAgentTools:
         api_index_path = Path(specs_dir) / "api_index.json"
 
         api_index = {
-            "petstore-simple.json": {"description": "Simple Pet Store API (Basic CRUD operations)"},
-            "train-travel.json": {"description": "Train Travel Booking API (Comprehensive)"},
+            "petstore-simple.json": {
+                "description": "Simple Pet Store API (Basic CRUD operations)"
+            },
+            "train-travel.json": {
+                "description": "Train Travel Booking API (Comprehensive)"
+            },
         }
 
         with open(api_index_path, "w") as f:
@@ -535,6 +547,7 @@ class TestResearchAgentTools:
         workshop_files = [
             f
             for f in actual.files_searched
-            if "workshop" in f or any(workshop_name in f for workshop_name in ["get", "post", "hoot"])
+            if "workshop" in f
+            or any(workshop_name in f for workshop_name in ["get", "post", "hoot"])
         ]
         assert len(workshop_files) > 0

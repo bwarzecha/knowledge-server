@@ -8,7 +8,8 @@ from .parser import MarkdownParser, ParseResult
 from .processor import MarkdownProcessor
 from .reference_scanner import ReferenceScanner
 from .scanner import DirectoryScanner
-from .section_splitter import AdaptiveSectionSplitter, SectionData, SplittingConfig
+from .section_splitter import (AdaptiveSectionSplitter, SectionData,
+                               SplittingConfig)
 
 __all__ = [
     "ChunkAssembler",

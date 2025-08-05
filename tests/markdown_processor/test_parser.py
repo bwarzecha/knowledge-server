@@ -96,7 +96,9 @@ Content without frontmatter data."""
         result = parser.parse_content(content)
 
         assert result.success is True
-        assert result.has_frontmatter is False  # Empty frontmatter treated as no frontmatter
+        assert (
+            result.has_frontmatter is False
+        )  # Empty frontmatter treated as no frontmatter
         assert result.frontmatter == {}
         assert result.content.startswith("# Document")
 

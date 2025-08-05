@@ -57,11 +57,15 @@ class MarkdownParser:
             )
 
         except UnicodeDecodeError as e:
-            return ParseResult(success=False, error=f"Unable to read file as UTF-8: {e}")
+            return ParseResult(
+                success=False, error=f"Unable to read file as UTF-8: {e}"
+            )
         except Exception as e:
             # Check if it's a YAML error by looking at the error message
             if "yaml" in str(e).lower() or "parser" in str(type(e).__name__).lower():
-                return ParseResult(success=False, error=f"Invalid YAML frontmatter: {e}")
+                return ParseResult(
+                    success=False, error=f"Invalid YAML frontmatter: {e}"
+                )
             return ParseResult(success=False, error=f"Error parsing file: {e}")
 
     def parse_content(self, content_text: str) -> ParseResult:
@@ -91,5 +95,7 @@ class MarkdownParser:
         except Exception as e:
             # Check if it's a YAML error by looking at the error message
             if "yaml" in str(e).lower() or "parser" in str(type(e).__name__).lower():
-                return ParseResult(success=False, error=f"Invalid YAML frontmatter: {e}")
+                return ParseResult(
+                    success=False, error=f"Invalid YAML frontmatter: {e}"
+                )
             return ParseResult(success=False, error=f"Error parsing content: {e}")

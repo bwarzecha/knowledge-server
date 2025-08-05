@@ -4,7 +4,8 @@ from pathlib import Path
 
 from src.markdown_processor.header_extractor import HeaderExtractor
 from src.markdown_processor.parser import MarkdownParser
-from src.markdown_processor.section_splitter import AdaptiveSectionSplitter, SplittingConfig
+from src.markdown_processor.section_splitter import (AdaptiveSectionSplitter,
+                                                     SplittingConfig)
 
 
 class TestAdaptiveSectionSplitter:
@@ -28,7 +29,9 @@ class TestAdaptiveSectionSplitter:
         headers = header_extractor.extract_headers(parse_result.content)
 
         # Split content
-        sections = splitter.split_content(parse_result.content, headers, parse_result.frontmatter)
+        sections = splitter.split_content(
+            parse_result.content, headers, parse_result.frontmatter
+        )
 
         # Should have multiple sections due to small token limit
         assert len(sections) > 3
@@ -43,9 +46,9 @@ class TestAdaptiveSectionSplitter:
         for section in sections[1:]:  # Skip frontmatter
             if section.token_count > 700:
                 # Large sections should be atomic (no subsections to split)
-                assert not section.is_split_section, (
-                    f"Large section should be atomic: {section.header.text if section.header else 'No header'}"
-                )
+                assert (
+                    not section.is_split_section
+                ), f"Large section should be atomic: {section.header.text if section.header else 'No header'}"
             else:
                 # Normal sized sections should be within limit
                 assert section.token_count <= 700
@@ -62,7 +65,9 @@ class TestAdaptiveSectionSplitter:
         parse_result = parser.parse_file(sample_file)
         headers = header_extractor.extract_headers(parse_result.content)
 
-        sections = splitter.split_content(parse_result.content, headers, parse_result.frontmatter)
+        sections = splitter.split_content(
+            parse_result.content, headers, parse_result.frontmatter
+        )
 
         # Should have fewer sections with larger token limit
         assert len(sections) >= 1
@@ -192,7 +197,10 @@ And this is subsection 3 with additional content that makes the splitting necess
         split_sections = [s for s in sections if s.is_split_section]
         if split_sections:
             assert split_sections[0].split_index == 1
-            assert all(s.split_parent_id == split_sections[0].split_parent_id for s in split_sections)
+            assert all(
+                s.split_parent_id == split_sections[0].split_parent_id
+                for s in split_sections
+            )
 
     def test_context_preservation_in_splits(self):
         """Test that context is preserved when sections are split."""
@@ -237,7 +245,9 @@ Available endpoints."""
         sections = splitter.split_content(content, headers, None)
 
         # Find split sections with context
-        split_sections = [s for s in sections if s.is_split_section and s.split_index > 1]
+        split_sections = [
+            s for s in sections if s.is_split_section and s.split_index > 1
+        ]
 
         if split_sections:
             # Should include parent context

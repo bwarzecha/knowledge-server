@@ -31,8 +31,12 @@ def index_command(
     openapi_dir = config.openapi_specs_dir
     md_dir = markdown_dir or config.markdown_source_dir
 
-    logger.info(f"📁 OpenAPI directory: {openapi_dir} {'(skipped)' if skip_openapi else ''}")
-    logger.info(f"📁 Markdown directory: {md_dir} {'(skipped)' if skip_markdown else ''}")
+    logger.info(
+        f"📁 OpenAPI directory: {openapi_dir} {'(skipped)' if skip_openapi else ''}"
+    )
+    logger.info(
+        f"📁 Markdown directory: {md_dir} {'(skipped)' if skip_markdown else ''}"
+    )
     logger.info(f"💾 Vector store: {config.vector_store_dir}")
     logger.info(f"📊 API index: {config.api_index_path}")
 
@@ -57,7 +61,9 @@ def index_command(
             if openapi_chunks:
                 all_chunks.extend(openapi_chunks)
                 all_source_dirs.append(openapi_dir)
-                logger.info(f"✅ Generated {len(openapi_chunks)} chunks from OpenAPI specifications")
+                logger.info(
+                    f"✅ Generated {len(openapi_chunks)} chunks from OpenAPI specifications"
+                )
             else:
                 logger.warning("⚠️ No chunks generated from OpenAPI specifications")
         else:
@@ -66,13 +72,17 @@ def index_command(
         # Step 2: Process Markdown files (unless skipped)
         if not skip_markdown:
             logger.info("📝 Step 2: Processing markdown files...")
-            markdown_processor = MarkdownProcessor(max_tokens=max_tokens or config.markdown_max_tokens)
+            markdown_processor = MarkdownProcessor(
+                max_tokens=max_tokens or config.markdown_max_tokens
+            )
             markdown_chunks = markdown_processor.process_directory(md_dir)
 
             if markdown_chunks:
                 all_chunks.extend(markdown_chunks)
                 all_source_dirs.append(md_dir)
-                logger.info(f"✅ Generated {len(markdown_chunks)} chunks from markdown files")
+                logger.info(
+                    f"✅ Generated {len(markdown_chunks)} chunks from markdown files"
+                )
             else:
                 logger.warning("⚠️ No chunks generated from markdown files")
         else:
@@ -104,8 +114,12 @@ def index_command(
 
         # Summary
         logger.info("🎉 Indexing completed successfully!")
-        logger.info(f"📊 Vector store: {len(all_chunks)} chunks in {config.vector_store_dir}")
-        logger.info(f"🔗 API index: {len(file_entries)} files, {tokens:,} tokens in {config.api_index_path}")
+        logger.info(
+            f"📊 Vector store: {len(all_chunks)} chunks in {config.vector_store_dir}"
+        )
+        logger.info(
+            f"🔗 API index: {len(file_entries)} files, {tokens:,} tokens in {config.api_index_path}"
+        )
         logger.info("🚀 Ready to serve! Run: knowledge-server serve")
 
     except Exception as e:

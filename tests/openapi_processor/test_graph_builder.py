@@ -28,7 +28,13 @@ class TestGraphBuilder:
                 content={
                     "get": {
                         "responses": {
-                            "200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Pet"}}}}
+                            "200": {
+                                "content": {
+                                    "application/json": {
+                                        "schema": {"$ref": "#/components/schemas/Pet"}
+                                    }
+                                }
+                            }
                         }
                     }
                 },
@@ -55,7 +61,9 @@ class TestGraphBuilder:
         for element in result:
             expected = expected_refs[element.element_id]
             assert element.metadata["ref_ids"] == expected["ref_ids"]
-            assert set(element.metadata["referenced_by"]) == set(expected["referenced_by"])
+            assert set(element.metadata["referenced_by"]) == set(
+                expected["referenced_by"]
+            )
 
     def test_build_no_references(self):
         """Test building graph with no references."""
@@ -90,7 +98,9 @@ class TestGraphBuilder:
                 content={
                     "Person": {
                         "type": "object",
-                        "properties": {"address": {"$ref": "#/components/schemas/Address"}},
+                        "properties": {
+                            "address": {"$ref": "#/components/schemas/Address"}
+                        },
                     }
                 },
                 metadata={"type": "component", "source_file": "api.json"},
@@ -98,7 +108,13 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:paths/people/get",
                 element_type="operation",
-                content={"get": {"responses": {"200": {"schema": {"$ref": "#/components/schemas/Person"}}}}},
+                content={
+                    "get": {
+                        "responses": {
+                            "200": {"schema": {"$ref": "#/components/schemas/Person"}}
+                        }
+                    }
+                },
                 metadata={"type": "operation", "source_file": "api.json"},
             ),
         ]
@@ -109,7 +125,11 @@ class TestGraphBuilder:
         # Expected graph structure
         expected_refs = {
             "api.json:paths/people/get": {
-                "ref_ids": {"api.json:components/schemas/Person": ["api.json:components/schemas/Address"]},
+                "ref_ids": {
+                    "api.json:components/schemas/Person": [
+                        "api.json:components/schemas/Address"
+                    ]
+                },
                 "referenced_by": [],
             },
             "api.json:components/schemas/Person": {
@@ -118,7 +138,9 @@ class TestGraphBuilder:
             },
             "api.json:components/schemas/Address": {
                 "ref_ids": {},
-                "referenced_by": ["api.json:components/schemas/Person"],  # Only direct references
+                "referenced_by": [
+                    "api.json:components/schemas/Person"
+                ],  # Only direct references
             },
         }
 
@@ -126,7 +148,9 @@ class TestGraphBuilder:
         for element in result:
             expected = expected_refs[element.element_id]
             assert element.metadata["ref_ids"] == expected["ref_ids"]
-            assert set(element.metadata["referenced_by"]) == set(expected["referenced_by"])
+            assert set(element.metadata["referenced_by"]) == set(
+                expected["referenced_by"]
+            )
 
     def test_circular_reference_handling(self):
         """Test handling of circular references (A -> B -> A)."""
@@ -162,13 +186,17 @@ class TestGraphBuilder:
         expected_refs = {
             "api.json:components/schemas/A": {
                 "ref_ids": {
-                    "api.json:components/schemas/B": ["api.json:components/schemas/A"]  # B has A as dependency
+                    "api.json:components/schemas/B": [
+                        "api.json:components/schemas/A"
+                    ]  # B has A as dependency
                 },
                 "referenced_by": ["api.json:components/schemas/B"],
             },
             "api.json:components/schemas/B": {
                 "ref_ids": {
-                    "api.json:components/schemas/A": ["api.json:components/schemas/B"]  # A has B as dependency
+                    "api.json:components/schemas/A": [
+                        "api.json:components/schemas/B"
+                    ]  # A has B as dependency
                 },
                 "referenced_by": ["api.json:components/schemas/A"],
             },
@@ -177,7 +205,9 @@ class TestGraphBuilder:
         for element in result:
             expected = expected_refs[element.element_id]
             assert element.metadata["ref_ids"] == expected["ref_ids"]
-            assert set(element.metadata["referenced_by"]) == set(expected["referenced_by"])
+            assert set(element.metadata["referenced_by"]) == set(
+                expected["referenced_by"]
+            )
 
     def test_deep_nested_dependencies(self):
         """Test deep dependency chain: Operation -> Company -> Person -> Address -> BaseType."""
@@ -191,25 +221,47 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:components/schemas/Address",
                 element_type="component",
-                content={"Address": {"properties": {"type": {"$ref": "#/components/schemas/BaseType"}}}},
+                content={
+                    "Address": {
+                        "properties": {
+                            "type": {"$ref": "#/components/schemas/BaseType"}
+                        }
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/Person",
                 element_type="component",
-                content={"Person": {"properties": {"address": {"$ref": "#/components/schemas/Address"}}}},
+                content={
+                    "Person": {
+                        "properties": {
+                            "address": {"$ref": "#/components/schemas/Address"}
+                        }
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/Company",
                 element_type="component",
-                content={"Company": {"properties": {"owner": {"$ref": "#/components/schemas/Person"}}}},
+                content={
+                    "Company": {
+                        "properties": {"owner": {"$ref": "#/components/schemas/Person"}}
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:paths/companies/get",
                 element_type="operation",
-                content={"get": {"responses": {"200": {"schema": {"$ref": "#/components/schemas/Company"}}}}},
+                content={
+                    "get": {
+                        "responses": {
+                            "200": {"schema": {"$ref": "#/components/schemas/Company"}}
+                        }
+                    }
+                },
                 metadata={"type": "operation", "source_file": "api.json"},
             ),
         ]
@@ -237,9 +289,15 @@ class TestGraphBuilder:
                 }
             },
             "api.json:components/schemas/Person": {
-                "ref_ids": {"api.json:components/schemas/Address": ["api.json:components/schemas/BaseType"]}
+                "ref_ids": {
+                    "api.json:components/schemas/Address": [
+                        "api.json:components/schemas/BaseType"
+                    ]
+                }
             },
-            "api.json:components/schemas/Address": {"ref_ids": {"api.json:components/schemas/BaseType": []}},
+            "api.json:components/schemas/Address": {
+                "ref_ids": {"api.json:components/schemas/BaseType": []}
+            },
             "api.json:components/schemas/BaseType": {"ref_ids": {}},
         }
 
@@ -264,13 +322,25 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:components/schemas/TypeA",
                 element_type="component",
-                content={"TypeA": {"properties": {"common": {"$ref": "#/components/schemas/Common"}}}},
+                content={
+                    "TypeA": {
+                        "properties": {
+                            "common": {"$ref": "#/components/schemas/Common"}
+                        }
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
                 element_id="api.json:components/schemas/TypeB",
                 element_type="component",
-                content={"TypeB": {"properties": {"common": {"$ref": "#/components/schemas/Common"}}}},
+                content={
+                    "TypeB": {
+                        "properties": {
+                            "common": {"$ref": "#/components/schemas/Common"}
+                        }
+                    }
+                },
                 metadata={"type": "component", "source_file": "api.json"},
             ),
             ExtractedElement(
@@ -278,8 +348,12 @@ class TestGraphBuilder:
                 element_type="operation",
                 content={
                     "post": {
-                        "requestBody": {"schema": {"$ref": "#/components/schemas/TypeA"}},
-                        "responses": {"200": {"schema": {"$ref": "#/components/schemas/TypeB"}}},
+                        "requestBody": {
+                            "schema": {"$ref": "#/components/schemas/TypeA"}
+                        },
+                        "responses": {
+                            "200": {"schema": {"$ref": "#/components/schemas/TypeB"}}
+                        },
                     }
                 },
                 metadata={"type": "operation", "source_file": "api.json"},
@@ -293,8 +367,12 @@ class TestGraphBuilder:
         expected_refs = {
             "api.json:paths/test/post": {
                 "ref_ids": {
-                    "api.json:components/schemas/TypeA": ["api.json:components/schemas/Common"],
-                    "api.json:components/schemas/TypeB": ["api.json:components/schemas/Common"],
+                    "api.json:components/schemas/TypeA": [
+                        "api.json:components/schemas/Common"
+                    ],
+                    "api.json:components/schemas/TypeB": [
+                        "api.json:components/schemas/Common"
+                    ],
                 }
             },
             "api.json:components/schemas/Common": {
@@ -308,10 +386,15 @@ class TestGraphBuilder:
 
         # Verify operation's references
         operation = next(e for e in result if e.element_type == "operation")
-        assert operation.metadata["ref_ids"] == expected_refs["api.json:paths/test/post"]["ref_ids"]
+        assert (
+            operation.metadata["ref_ids"]
+            == expected_refs["api.json:paths/test/post"]["ref_ids"]
+        )
 
         # Verify Common is referenced by all three
-        common = next(e for e in result if e.element_id == "api.json:components/schemas/Common")
+        common = next(
+            e for e in result if e.element_id == "api.json:components/schemas/Common"
+        )
         assert set(common.metadata["referenced_by"]) == set(
             expected_refs["api.json:components/schemas/Common"]["referenced_by"]
         )
@@ -322,7 +405,15 @@ class TestGraphBuilder:
             ExtractedElement(
                 element_id="api.json:paths/pets/get",
                 element_type="operation",
-                content={"get": {"responses": {"200": {"schema": {"$ref": "#/components/schemas/NonExistent"}}}}},
+                content={
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "schema": {"$ref": "#/components/schemas/NonExistent"}
+                            }
+                        }
+                    }
+                },
                 metadata={"type": "operation", "source_file": "api.json"},
             )
         ]

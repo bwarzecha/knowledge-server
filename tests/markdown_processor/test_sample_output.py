@@ -6,7 +6,8 @@ from pathlib import Path
 from src.markdown_processor.chunk_assembler import ChunkAssembler
 from src.markdown_processor.header_extractor import HeaderExtractor
 from src.markdown_processor.parser import MarkdownParser
-from src.markdown_processor.section_splitter import AdaptiveSectionSplitter, SplittingConfig
+from src.markdown_processor.section_splitter import (AdaptiveSectionSplitter,
+                                                     SplittingConfig)
 
 
 def test_show_sample_output():
@@ -29,10 +30,14 @@ def test_show_sample_output():
     headers = header_extractor.extract_headers(parse_result.content)
 
     # Split sections
-    sections = splitter.split_content(parse_result.content, headers, parse_result.frontmatter)
+    sections = splitter.split_content(
+        parse_result.content, headers, parse_result.frontmatter
+    )
 
     # Assemble chunks
-    chunks = assembler.assemble_chunks(sections, parse_result.frontmatter, str(sample_file.name))
+    chunks = assembler.assemble_chunks(
+        sections, parse_result.frontmatter, str(sample_file.name)
+    )
 
     print("\n\n=== SAMPLE OUTPUT ===")
     print(f"File: {sample_file.name}")
@@ -54,7 +59,9 @@ def test_show_sample_output():
         print(f"  Document Preview: {chunk['document'][:100]}...")
 
         if chunk["metadata"].get("is_split_section"):
-            print(f"  Split Info: {chunk['metadata']['split_index']}/{chunk['metadata']['total_splits']}")
+            print(
+                f"  Split Info: {chunk['metadata']['split_index']}/{chunk['metadata']['total_splits']}"
+            )
 
     # Show navigation example
     print("\n--- Navigation Example ---")

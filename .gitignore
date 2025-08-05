@@ -106,7 +106,14 @@ chromadb/
 # Prototypes - keep Python research scripts only
 prototypes/models/
 prototypes/*.json
-prototypes/*.jsonllocal/
+prototypes/*.jsonl
 
-# Local
+# Local work directories
 local/
+
+# Test cache directories
+test_cache*/
+debug_chromadb/
+
+# Experiments
+experiments/

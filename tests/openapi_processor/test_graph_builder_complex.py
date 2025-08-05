@@ -17,7 +17,9 @@ class TestGraphBuilderComplex:
         extractor = ElementExtractor()
         builder = GraphBuilder()
 
-        parse_result = parser.parse_file("open-api-small-samples/3.0/json/complex-nesting.json")
+        parse_result = parser.parse_file(
+            "open-api-small-samples/3.0/json/complex-nesting.json"
+        )
         assert parse_result.success
 
         validation_result = validator.validate(parse_result.data)
@@ -101,19 +103,25 @@ class TestGraphBuilderComplex:
             {
                 "id": "test.json:components/schemas/A",
                 "type": "component",
-                "content": {"A": {"properties": {"b": {"$ref": "#/components/schemas/B"}}}},
+                "content": {
+                    "A": {"properties": {"b": {"$ref": "#/components/schemas/B"}}}
+                },
                 "metadata": {"type": "component", "source_file": "test.json"},
             },
             {
                 "id": "test.json:components/schemas/B",
                 "type": "component",
-                "content": {"B": {"properties": {"c": {"$ref": "#/components/schemas/C"}}}},
+                "content": {
+                    "B": {"properties": {"c": {"$ref": "#/components/schemas/C"}}}
+                },
                 "metadata": {"type": "component", "source_file": "test.json"},
             },
             {
                 "id": "test.json:components/schemas/C",
                 "type": "component",
-                "content": {"C": {"properties": {"a": {"$ref": "#/components/schemas/A"}}}},
+                "content": {
+                    "C": {"properties": {"a": {"$ref": "#/components/schemas/A"}}}
+                },
                 "metadata": {"type": "component", "source_file": "test.json"},
             },
         ]
@@ -245,8 +253,13 @@ class TestGraphBuilderComplex:
             }
 
         # Verify the diamond pattern
-        assert actual["test.json:schemas/A"]["ref_ids"] == expected["test.json:schemas/A"]["ref_ids"]
-        assert actual["test.json:schemas/D"]["referenced_by"] == set(expected["test.json:schemas/D"]["referenced_by"])
+        assert (
+            actual["test.json:schemas/A"]["ref_ids"]
+            == expected["test.json:schemas/A"]["ref_ids"]
+        )
+        assert actual["test.json:schemas/D"]["referenced_by"] == set(
+            expected["test.json:schemas/D"]["referenced_by"]
+        )
 
     def test_deep_linear_chain(self):
         """Test deep linear dependency chain: A -> B -> C -> D -> E."""
@@ -259,7 +272,9 @@ class TestGraphBuilderComplex:
                 content = {schema: {"type": "string"}}
             else:  # Others reference the previous
                 prev = schemas[i - 1]
-                content = {schema: {"properties": {"ref": {"$ref": f"#/schemas/{prev}"}}}}
+                content = {
+                    schema: {"properties": {"ref": {"$ref": f"#/schemas/{prev}"}}}
+                }
 
             from src.openapi_processor.extractor import ExtractedElement
 
@@ -294,7 +309,9 @@ class TestGraphBuilderComplex:
                     ]
                 }
             },
-            "test.json:schemas/C": {"ref_ids": {"test.json:schemas/D": ["test.json:schemas/E"]}},
+            "test.json:schemas/C": {
+                "ref_ids": {"test.json:schemas/D": ["test.json:schemas/E"]}
+            },
             "test.json:schemas/D": {"ref_ids": {"test.json:schemas/E": []}},
             "test.json:schemas/E": {"ref_ids": {}},
         }

@@ -164,7 +164,9 @@ class IndexBuilder:
         logger.info(f"   Total text: {len(total_text):,} chars, {tokens:,} tokens")
         return tokens
 
-    def create_compact_text(self, file_entries: List[Dict[str, Any]], max_chars: int = 1200) -> str:
+    def create_compact_text(
+        self, file_entries: List[Dict[str, Any]], max_chars: int = 1200
+    ) -> str:
         """Create compact text representation for LLM context."""
         combined_texts = []
         char_count = 0
@@ -184,7 +186,9 @@ class IndexBuilder:
                     # Try to cut at a line boundary
                     if "\n" in truncated_text:
                         lines = truncated_text.split("\n")
-                        truncated_text = "\n".join(lines[:-1])  # Remove partial last line
+                        truncated_text = "\n".join(
+                            lines[:-1]
+                        )  # Remove partial last line
                     combined_texts.append(truncated_text)
                 break
 

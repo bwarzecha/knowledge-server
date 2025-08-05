@@ -60,13 +60,17 @@ class TestVectorStoreIntegration:
         assert info["count"] == len(openapi_chunks)
 
         # Test search functionality
-        search_results = vector_store.search("API endpoint for user management", limit=5)
+        search_results = vector_store.search(
+            "API endpoint for user management", limit=5
+        )
         assert len(search_results) <= 5
         assert all("id" in result for result in search_results)
         assert all("distance" in result for result in search_results)
 
         # Test filtered search
-        component_results = vector_store.search("schema definition", limit=3, filters={"type": "component"})
+        component_results = vector_store.search(
+            "schema definition", limit=3, filters={"type": "component"}
+        )
 
         # Verify all results are components (if any found)
         for result in component_results:
@@ -173,7 +177,9 @@ class TestVectorStoreIntegration:
                         break
 
                 # At least one result should be semantically relevant
-                assert found_relevant, f"No relevant results found for query: {test_case['query']}"
+                assert (
+                    found_relevant
+                ), f"No relevant results found for query: {test_case['query']}"
 
     def test_batch_processing_large_dataset(self, vector_store):
         """Test batch processing with a larger subset of chunks."""
@@ -207,7 +213,9 @@ class TestVectorStoreIntegration:
         retrieved = vector_store.get_by_ids(test_ids)
         assert len(retrieved) == len(test_ids)
 
-    def test_persistence_across_restarts(self, vector_store, openapi_chunks, temp_db_dir):
+    def test_persistence_across_restarts(
+        self, vector_store, openapi_chunks, temp_db_dir
+    ):
         """Test that data persists across VectorStore restarts."""
         # Initial setup and indexing
         vector_store.setup()

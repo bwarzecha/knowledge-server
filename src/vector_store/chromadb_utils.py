@@ -10,10 +10,8 @@ from sentence_transformers import SentenceTransformer
 
 from .embedding_cache import EmbeddingCache
 from .embedding_utils import encode_documents, encode_query
-from .metadata_utils import (
-    prepare_metadata_for_chromadb,
-    restore_metadata_from_chromadb,
-)
+from .metadata_utils import (prepare_metadata_for_chromadb,
+                             restore_metadata_from_chromadb)
 
 logger = logging.getLogger(__name__)
 
@@ -53,13 +51,17 @@ class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
             model_name = getattr(self.model, "model_name", model_name)
         elif hasattr(self.model, "name"):
             model_name = self.model.name
-        elif hasattr(self.model, "config") and hasattr(self.model.config, "name_or_path"):
+        elif hasattr(self.model, "config") and hasattr(
+            self.model.config, "name_or_path"
+        ):
             model_name = self.model.config.name_or_path
 
         return {"model_name": model_name, "max_tokens": self.max_tokens}
 
     @classmethod
-    def build_from_config(cls, config: Dict[str, Any]) -> "SentenceTransformerEmbeddingFunction":
+    def build_from_config(
+        cls, config: Dict[str, Any]
+    ) -> "SentenceTransformerEmbeddingFunction":
         """Build embedding function from configuration."""
         model_name = config.get("model_name", "dunzhang/stella_en_1.5B_v5")
         max_tokens = config.get("max_tokens")
@@ -133,7 +135,9 @@ def create_collection(
     try:
         # Check if collection exists
         existing_collections = client.list_collections()
-        collection_exists = any(col.name == collection_name for col in existing_collections)
+        collection_exists = any(
+            col.name == collection_name for col in existing_collections
+        )
 
         if collection_exists and reset:
             logger.info(f"Deleting existing collection: {collection_name}")
@@ -142,7 +146,9 @@ def create_collection(
 
         if collection_exists:
             logger.info(f"Using existing collection: {collection_name}")
-            collection = client.get_collection(name=collection_name, embedding_function=embedding_function)
+            collection = client.get_collection(
+                name=collection_name, embedding_function=embedding_function
+            )
         else:
             logger.info(f"Creating new collection: {collection_name}")
             collection = client.create_collection(
@@ -186,19 +192,25 @@ def add_chunks_to_collection(
             # Prepare batch data
             ids = [chunk["id"] for chunk in batch]
             documents = [chunk["document"] for chunk in batch]
-            metadatas = [prepare_metadata_for_chromadb(chunk["metadata"]) for chunk in batch]
+            metadatas = [
+                prepare_metadata_for_chromadb(chunk["metadata"]) for chunk in batch
+            ]
 
             # If we have cache and embedding function, compute embeddings with cache
             if cache and hasattr(collection._embedding_function, "model"):
                 # Extract content hashes from metadata
-                content_hashes = [chunk["metadata"].get("content_hash") for chunk in batch]
+                content_hashes = [
+                    chunk["metadata"].get("content_hash") for chunk in batch
+                ]
 
                 # Only use cache if all chunks have content hashes
                 if all(h is not None for h in content_hashes):
                     embeddings = encode_documents(
                         documents,
                         collection._embedding_function.model,
-                        max_tokens=getattr(collection._embedding_function, "max_tokens", None),
+                        max_tokens=getattr(
+                            collection._embedding_function, "max_tokens", None
+                        ),
                         cache=cache,
                         content_hashes=content_hashes,
                     )
@@ -218,7 +230,9 @@ def add_chunks_to_collection(
 
             batch_num = i // batch_size + 1
             total_batches = (len(chunks) + batch_size - 1) // batch_size
-            logger.info(f"Added batch {batch_num}/{total_batches}: chunks {i + 1}-{min(i + batch_size, len(chunks))}")
+            logger.info(
+                f"Added batch {batch_num}/{total_batches}: chunks {i + 1}-{min(i + batch_size, len(chunks))}"
+            )
 
         except Exception as e:
             logger.error(f"Failed to add batch {i // batch_size + 1}: {e}")
@@ -274,7 +288,9 @@ def search_collection(
                 result = {
                     "id": results["ids"][0][i],
                     "document": results["documents"][0][i],
-                    "metadata": restore_metadata_from_chromadb(results["metadatas"][0][i]),
+                    "metadata": restore_metadata_from_chromadb(
+                        results["metadatas"][0][i]
+                    ),
                     "distance": results["distances"][0][i],
                     "rank": i + 1,
                 }
@@ -288,7 +304,9 @@ def search_collection(
         raise
 
 
-def get_chunks_by_ids(collection: chromadb.Collection, ids: List[str]) -> List[Dict[str, Any]]:
+def get_chunks_by_ids(
+    collection: chromadb.Collection, ids: List[str]
+) -> List[Dict[str, Any]]:
     """
     Retrieve chunks by their IDs.
 

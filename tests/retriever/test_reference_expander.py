@@ -3,12 +3,10 @@
 import pytest
 
 from src.retriever.reference_expander import ReferenceExpander
-from tests.retriever.test_helpers import (
-    MockVectorStore,
-    get_chunks_with_references,
-    get_circular_reference_chunks,
-    get_real_test_chunks,
-)
+from tests.retriever.test_helpers import (MockVectorStore,
+                                          get_chunks_with_references,
+                                          get_circular_reference_chunks,
+                                          get_real_test_chunks)
 
 
 class TestReferenceExpander:
@@ -55,7 +53,9 @@ class TestReferenceExpander:
 
         # Should find at least some of the referenced chunks
         if ref_ids:
-            assert len(referenced_chunks) > 0, "Should find at least one referenced chunk"
+            assert (
+                len(referenced_chunks) > 0
+            ), "Should find at least one referenced chunk"
 
         print(f"Found {len(referenced_chunks)} referenced chunks")
         for chunk in referenced_chunks:
@@ -67,7 +67,9 @@ class TestReferenceExpander:
             # Get chunks that reference each other
             operation_chunk, error_chunk = get_circular_reference_chunks()
 
-            print(f"Testing circular refs: {operation_chunk['id']} <-> {error_chunk['id']}")
+            print(
+                f"Testing circular refs: {operation_chunk['id']} <-> {error_chunk['id']}"
+            )
 
             # Start expansion from operation chunk
             referenced_chunks, stats = reference_expander.expand_references(
@@ -113,8 +115,12 @@ class TestReferenceExpander:
         # Usually deeper search should find same or more chunks
         assert len(referenced_chunks_d2) >= len(referenced_chunks_d1)
 
-        print(f"Depth 1: {len(referenced_chunks_d1)} chunks, max depth {stats_d1.depth_reached}")
-        print(f"Depth 2: {len(referenced_chunks_d2)} chunks, max depth {stats_d2.depth_reached}")
+        print(
+            f"Depth 1: {len(referenced_chunks_d1)} chunks, max depth {stats_d1.depth_reached}"
+        )
+        print(
+            f"Depth 2: {len(referenced_chunks_d2)} chunks, max depth {stats_d2.depth_reached}"
+        )
 
     def test_count_limiting(self, reference_expander):
         """Test that max_total parameter limits number of results."""
@@ -145,7 +151,9 @@ class TestReferenceExpander:
 
     def test_empty_primary_chunks(self, reference_expander):
         """Test expansion with empty primary chunks list."""
-        referenced_chunks, stats = reference_expander.expand_references(primary_chunks=[], max_depth=3, max_total=10)
+        referenced_chunks, stats = reference_expander.expand_references(
+            primary_chunks=[], max_depth=3, max_total=10
+        )
 
         assert referenced_chunks == []
         assert stats.primary_count == 0
@@ -156,7 +164,9 @@ class TestReferenceExpander:
     def test_chunks_without_references(self, reference_expander, real_chunks):
         """Test expansion with chunks that have no references."""
         # Find chunks without references
-        chunks_without_refs = [chunk for chunk in real_chunks if not chunk["metadata"].get("ref_ids")]
+        chunks_without_refs = [
+            chunk for chunk in real_chunks if not chunk["metadata"].get("ref_ids")
+        ]
 
         if not chunks_without_refs:
             pytest.skip("All chunks have references")

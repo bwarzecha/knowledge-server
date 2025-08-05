@@ -38,7 +38,10 @@ class TestRetryConfiguration:
 
         # Verify the config has retry settings
         aws_config = call_args.kwargs["config"]
-        assert aws_config.retries["max_attempts"] == config.research_agent_llm_retry_max_attempts
+        assert (
+            aws_config.retries["max_attempts"]
+            == config.research_agent_llm_retry_max_attempts
+        )
         assert aws_config.retries["mode"] == "standard"
 
     @patch("src.research_agent.tools.ChatBedrockConverse")
@@ -76,7 +79,10 @@ class TestRetryConfiguration:
 
         # Verify the config has retry settings
         aws_config = call_args.kwargs["config"]
-        assert aws_config.retries["max_attempts"] == config.chunk_filtering_llm_retry_max_attempts
+        assert (
+            aws_config.retries["max_attempts"]
+            == config.chunk_filtering_llm_retry_max_attempts
+        )
         assert aws_config.retries["mode"] == "standard"
 
     def test_retry_config_from_environment(self):
@@ -84,7 +90,10 @@ class TestRetryConfiguration:
         import os
 
         # Test with custom environment values
-        test_env = {"RESEARCH_AGENT_LLM_RETRY_MAX_ATTEMPTS": "5", "CHUNK_FILTERING_LLM_RETRY_MAX_ATTEMPTS": "2"}
+        test_env = {
+            "RESEARCH_AGENT_LLM_RETRY_MAX_ATTEMPTS": "5",
+            "CHUNK_FILTERING_LLM_RETRY_MAX_ATTEMPTS": "2",
+        }
 
         with patch.dict(os.environ, test_env):
             config = Config()

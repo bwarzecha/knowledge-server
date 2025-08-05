@@ -7,15 +7,10 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 if TYPE_CHECKING:
     from ..cli.config import Config
 
-from .chromadb_utils import (
-    SentenceTransformerEmbeddingFunction,
-    add_chunks_to_collection,
-    create_chromadb_client,
-    create_collection,
-    get_chunks_by_ids,
-    get_collection_info,
-    search_collection,
-)
+from .chromadb_utils import (SentenceTransformerEmbeddingFunction,
+                             add_chunks_to_collection, create_chromadb_client,
+                             create_collection, get_chunks_by_ids,
+                             get_collection_info, search_collection)
 from .embedding_cache import EmbeddingCache
 from .embedding_utils import load_embedding_model
 
@@ -62,7 +57,9 @@ class VectorStoreManager:
         logger.info(f"Initialized VectorStoreManager with model {embedding_model_name}")
 
     @classmethod
-    def from_config(cls, config: "Config", reset_on_start: bool = False) -> "VectorStoreManager":
+    def from_config(
+        cls, config: "Config", reset_on_start: bool = False
+    ) -> "VectorStoreManager":
         """
         Create VectorStoreManager from Config object.
 
@@ -94,7 +91,9 @@ class VectorStoreManager:
 
         # Load embedding model
         logger.info(f"Loading embedding model: {self.embedding_model_name}")
-        self.embedding_model = load_embedding_model(self.embedding_model_name, device=self.embedding_device)
+        self.embedding_model = load_embedding_model(
+            self.embedding_model_name, device=self.embedding_device
+        )
 
         # Create embedding cache
         self.embedding_cache = EmbeddingCache()
@@ -126,13 +125,17 @@ class VectorStoreManager:
             raise RuntimeError("VectorStoreManager not set up. Call setup() first.")
 
         logger.info(f"Adding {len(chunks)} chunks to vector store")
-        add_chunks_to_collection(self.collection, chunks, batch_size, cache=self.embedding_cache)
+        add_chunks_to_collection(
+            self.collection, chunks, batch_size, cache=self.embedding_cache
+        )
 
         # Log final count
         info = self.get_info()
         logger.info(f"Vector store now contains {info['count']} documents")
 
-    def search(self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def search(
+        self, query: str, limit: int = 5, filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
         """
         Search the vector store using semantic similarity.
 
@@ -201,7 +204,9 @@ class VectorStoreManager:
         logger.warning(f"Clearing collection {self.collection_name}")
 
         # Delete and recreate collection
-        self.collection = create_collection(self.client, self.collection_name, self.embedding_function, reset=True)
+        self.collection = create_collection(
+            self.client, self.collection_name, self.embedding_function, reset=True
+        )
 
         # Note: To clear the cache, delete the embedding_cache.db file
         logger.info("Collection cleared")

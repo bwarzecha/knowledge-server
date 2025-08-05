@@ -52,8 +52,12 @@ async def _ask_command_async(
 
     if verbose:
         logger.info(f"🔍 Query: {query}")
-        logger.info(f"⚙️  Settings: max_response_length={max_response_length}, max_chunks={max_chunks}")
-        logger.info(f"🔗 References: {'enabled' if include_references else 'disabled'}, max_depth={max_depth}")
+        logger.info(
+            f"⚙️  Settings: max_response_length={max_response_length}, max_chunks={max_chunks}"
+        )
+        logger.info(
+            f"🔗 References: {'enabled' if include_references else 'disabled'}, max_depth={max_depth}"
+        )
         logger.info("")
 
     # Check if indices exist

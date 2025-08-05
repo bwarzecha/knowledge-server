@@ -36,7 +36,11 @@ class SharedResources:
 
     def is_ready(self) -> bool:
         """Check if all resources are loaded and ready."""
-        return self.vector_store is not None and self.retriever is not None and self.api_index is not None
+        return (
+            self.vector_store is not None
+            and self.retriever is not None
+            and self.api_index is not None
+        )
 
 
 # Global shared resources instance

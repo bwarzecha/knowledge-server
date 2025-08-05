@@ -36,7 +36,9 @@ class NavigationBuilder:
     def __init__(self):
         pass
 
-    def build_navigation(self, sections: List[SectionData], filename: str) -> Dict[str, NavigationMetadata]:
+    def build_navigation(
+        self, sections: List[SectionData], filename: str
+    ) -> Dict[str, NavigationMetadata]:
         """
         Build navigation metadata for all sections.
 
@@ -74,14 +76,18 @@ class NavigationBuilder:
             navigation[section_id] = nav_meta
 
         # Build hierarchical relationships
-        self._build_hierarchical_navigation(sections, section_ids, section_lookup, navigation)
+        self._build_hierarchical_navigation(
+            sections, section_ids, section_lookup, navigation
+        )
 
         # Build section paths and context
         self._build_section_paths(sections, section_ids, section_lookup, navigation)
 
         return navigation
 
-    def _generate_chunk_id(self, section: SectionData, filename: str, index: int) -> str:
+    def _generate_chunk_id(
+        self, section: SectionData, filename: str, index: int
+    ) -> str:
         """
         Generate chunk ID for a section.
 
@@ -102,8 +108,14 @@ class NavigationBuilder:
             # Add line number to ensure uniqueness
             line_num = section.header.line_number
             # Handle split sections
-            if section.is_split_section and section.split_index and section.split_index > 1:
-                return f"{filename}:{section_identifier}:L{line_num}-{section.split_index}"
+            if (
+                section.is_split_section
+                and section.split_index
+                and section.split_index > 1
+            ):
+                return (
+                    f"{filename}:{section_identifier}:L{line_num}-{section.split_index}"
+                )
             return f"{filename}:{section_identifier}:L{line_num}"
         else:
             # Fallback
@@ -180,7 +192,10 @@ class NavigationBuilder:
                 other_nav = navigation[other_id]
 
                 # Same level and same parent = siblings
-                if other["level"] == current_level and other_nav.parent_section == current_parent:
+                if (
+                    other["level"] == current_level
+                    and other_nav.parent_section == current_parent
+                ):
                     if other_id not in nav_meta.sibling_sections:
                         nav_meta.sibling_sections.append(other_id)
 
@@ -285,7 +300,9 @@ class NavigationBuilder:
                     # (The parent is the first split section, not the logical parent)
                     pass
 
-    def validate_navigation(self, navigation: Dict[str, NavigationMetadata]) -> List[str]:
+    def validate_navigation(
+        self, navigation: Dict[str, NavigationMetadata]
+    ) -> List[str]:
         """
         Validate navigation relationships for consistency.
 
@@ -300,23 +317,33 @@ class NavigationBuilder:
         for section_id, nav_meta in navigation.items():
             # Check that previous/next references exist
             if nav_meta.previous_chunk and nav_meta.previous_chunk not in navigation:
-                errors.append(f"Section {section_id} references non-existent previous chunk {nav_meta.previous_chunk}")
+                errors.append(
+                    f"Section {section_id} references non-existent previous chunk {nav_meta.previous_chunk}"
+                )
 
             if nav_meta.next_chunk and nav_meta.next_chunk not in navigation:
-                errors.append(f"Section {section_id} references non-existent next chunk {nav_meta.next_chunk}")
+                errors.append(
+                    f"Section {section_id} references non-existent next chunk {nav_meta.next_chunk}"
+                )
 
             # Check that parent references exist
             if nav_meta.parent_section and nav_meta.parent_section not in navigation:
-                errors.append(f"Section {section_id} references non-existent parent {nav_meta.parent_section}")
+                errors.append(
+                    f"Section {section_id} references non-existent parent {nav_meta.parent_section}"
+                )
 
             # Check that child references exist
             for child_id in nav_meta.child_sections:
                 if child_id not in navigation:
-                    errors.append(f"Section {section_id} references non-existent child {child_id}")
+                    errors.append(
+                        f"Section {section_id} references non-existent child {child_id}"
+                    )
 
             # Check that sibling references exist
             for sibling_id in nav_meta.sibling_sections:
                 if sibling_id not in navigation:
-                    errors.append(f"Section {section_id} references non-existent sibling {sibling_id}")
+                    errors.append(
+                        f"Section {section_id} references non-existent sibling {sibling_id}"
+                    )
 
         return errors

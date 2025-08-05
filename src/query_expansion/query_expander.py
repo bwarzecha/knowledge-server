@@ -89,12 +89,16 @@ class QueryExpander:
                     # If we haven't added any content yet, take partial content from first file
                     if not combined_texts:
                         # Take as much as we can from the first file
-                        available_chars = self.max_context_chars - 10  # Leave some buffer
+                        available_chars = (
+                            self.max_context_chars - 10
+                        )  # Leave some buffer
                         truncated_text = file_text[:available_chars]
                         # Try to cut at a line boundary
                         if "\n" in truncated_text:
                             lines = truncated_text.split("\n")
-                            truncated_text = "\n".join(lines[:-1])  # Remove partial last line
+                            truncated_text = "\n".join(
+                                lines[:-1]
+                            )  # Remove partial last line
                         combined_texts.append(truncated_text)
                     break
 

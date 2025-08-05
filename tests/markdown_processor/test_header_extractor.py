@@ -140,7 +140,10 @@ Content for section 2."""
         # Check section paths
         assert hierarchical[0]["section_path"] == "getting-started"
         assert hierarchical[1]["section_path"] == "getting-started/installation"
-        assert hierarchical[2]["section_path"] == "getting-started/installation/requirements"
+        assert (
+            hierarchical[2]["section_path"]
+            == "getting-started/installation/requirements"
+        )
         assert hierarchical[3]["section_path"] == "getting-started/configuration"
 
     def test_slugify_function(self):

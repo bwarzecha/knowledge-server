@@ -28,7 +28,9 @@ class TestKnowledgeRetrieverIntegration:
         """Generate real chunks from OpenAPI samples."""
         config = Config()
         processor = OpenAPIProcessor(config)
-        chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
+        chunks = processor.process_directory(
+            "open-api-small-samples/3.0/json/openapi-workshop"
+        )
         return chunks
 
     @pytest.fixture(scope="class")
@@ -71,12 +73,16 @@ class TestKnowledgeRetrieverIntegration:
         assert context.query == query
         assert isinstance(context.primary_chunks, list)
         assert isinstance(context.referenced_chunks, list)
-        assert context.total_chunks == len(context.primary_chunks) + len(context.referenced_chunks)
+        assert context.total_chunks == len(context.primary_chunks) + len(
+            context.referenced_chunks
+        )
         assert context.total_tokens > 0
         assert context.retrieval_stats.total_time_ms > 0
 
         # Should find relevant chunks
-        assert len(context.primary_chunks) > 0, "Should find primary chunks for hoot query"
+        assert (
+            len(context.primary_chunks) > 0
+        ), "Should find primary chunks for hoot query"
 
         # Check if we found hoot-related content
         hoot_related = False
@@ -100,7 +106,9 @@ class TestKnowledgeRetrieverIntegration:
             assert chunk.retrieval_reason == "referenced_dependency"
 
         print(f"Query: {query}")
-        print(f"Found {len(context.primary_chunks)} primary + {len(context.referenced_chunks)} referenced chunks")
+        print(
+            f"Found {len(context.primary_chunks)} primary + {len(context.referenced_chunks)} referenced chunks"
+        )
         print(f"Total tokens: {context.total_tokens}")
         print(f"Time: {context.retrieval_stats.total_time_ms:.1f}ms")
 
@@ -114,7 +122,10 @@ class TestKnowledgeRetrieverIntegration:
 
         # Should find schema-related content
         for chunk in context.primary_chunks:
-            if "schema" in chunk.document.lower() or chunk.metadata.get("type") == "component":
+            if (
+                "schema" in chunk.document.lower()
+                or chunk.metadata.get("type") == "component"
+            ):
                 break
 
         # Note: Might not find exact match depending on sample data
@@ -130,13 +141,19 @@ class TestKnowledgeRetrieverIntegration:
         context_with_refs = retriever.retrieve_knowledge(query, include_references=True)
 
         # Test with reference expansion disabled
-        context_without_refs = retriever.retrieve_knowledge(query, include_references=False)
+        context_without_refs = retriever.retrieve_knowledge(
+            query, include_references=False
+        )
 
         # Should have same primary chunks
-        assert len(context_with_refs.primary_chunks) == len(context_without_refs.primary_chunks)
+        assert len(context_with_refs.primary_chunks) == len(
+            context_without_refs.primary_chunks
+        )
 
         # With references should have more total chunks (if any references exist)
-        if any(chunk.metadata.get("ref_ids") for chunk in context_with_refs.primary_chunks):
+        if any(
+            chunk.metadata.get("ref_ids") for chunk in context_with_refs.primary_chunks
+        ):
             assert context_with_refs.total_chunks >= context_without_refs.total_chunks
             assert len(context_with_refs.referenced_chunks) >= 0
 
@@ -151,10 +168,14 @@ class TestKnowledgeRetrieverIntegration:
         query = "hoot operations"
 
         # Test with small limits
-        context_small = retriever.retrieve_knowledge(query, max_primary_results=2, max_total_chunks=5, max_depth=1)
+        context_small = retriever.retrieve_knowledge(
+            query, max_primary_results=2, max_total_chunks=5, max_depth=1
+        )
 
         # Test with larger limits
-        context_large = retriever.retrieve_knowledge(query, max_primary_results=8, max_total_chunks=20, max_depth=3)
+        context_large = retriever.retrieve_knowledge(
+            query, max_primary_results=8, max_total_chunks=20, max_depth=3
+        )
 
         # Small limits should be respected
         assert len(context_small.primary_chunks) <= 2
@@ -165,8 +186,12 @@ class TestKnowledgeRetrieverIntegration:
         assert len(context_large.primary_chunks) >= len(context_small.primary_chunks)
         assert context_large.total_chunks >= context_small.total_chunks
 
-        print(f"Small limits: {context_small.total_chunks} chunks, depth {context_small.retrieval_stats.depth_reached}")
-        print(f"Large limits: {context_large.total_chunks} chunks, depth {context_large.retrieval_stats.depth_reached}")
+        print(
+            f"Small limits: {context_small.total_chunks} chunks, depth {context_small.retrieval_stats.depth_reached}"
+        )
+        print(
+            f"Large limits: {context_large.total_chunks} chunks, depth {context_large.retrieval_stats.depth_reached}"
+        )
 
     def test_empty_query_handling(self, retriever):
         """Test handling of empty or invalid queries."""
@@ -194,7 +219,9 @@ class TestKnowledgeRetrieverIntegration:
         assert context.query == query
         assert isinstance(context.primary_chunks, list)
         assert isinstance(context.referenced_chunks, list)
-        assert context.total_chunks >= 0  # May find some results due to embedding similarity
+        assert (
+            context.total_chunks >= 0
+        )  # May find some results due to embedding similarity
         assert context.total_tokens >= 0
 
         print(f"Rare term query returned {context.total_chunks} chunks")
@@ -220,15 +247,19 @@ class TestKnowledgeRetrieverIntegration:
                 total_time += context.retrieval_stats.total_time_ms
 
                 # Each query should complete reasonably quickly
-                assert context.retrieval_stats.total_time_ms < 2000, (
-                    f"Query '{query}' took too long: {context.retrieval_stats.total_time_ms}ms"
-                )
+                assert (
+                    context.retrieval_stats.total_time_ms < 2000
+                ), f"Query '{query}' took too long: {context.retrieval_stats.total_time_ms}ms"
 
-                print(f"'{query}': {len(context.primary_chunks)} chunks, {context.retrieval_stats.total_time_ms:.1f}ms")
+                print(
+                    f"'{query}': {len(context.primary_chunks)} chunks, {context.retrieval_stats.total_time_ms:.1f}ms"
+                )
 
         if successful_queries > 0:
             avg_time = total_time / successful_queries
-            print(f"Average retrieval time: {avg_time:.1f}ms across {successful_queries} successful queries")
+            print(
+                f"Average retrieval time: {avg_time:.1f}ms across {successful_queries} successful queries"
+            )
 
             # Average should be reasonable
             assert avg_time < 1000, f"Average retrieval time too slow: {avg_time}ms"
@@ -245,9 +276,13 @@ class TestKnowledgeRetrieverIntegration:
 
             # Should be reasonable per chunk (not too low or too high)
             avg_tokens_per_chunk = context.total_tokens / context.total_chunks
-            assert 10 < avg_tokens_per_chunk < 1000, f"Average tokens per chunk seems wrong: {avg_tokens_per_chunk}"
+            assert (
+                10 < avg_tokens_per_chunk < 1000
+            ), f"Average tokens per chunk seems wrong: {avg_tokens_per_chunk}"
 
-            print(f"Total tokens: {context.total_tokens} across {context.total_chunks} chunks")
+            print(
+                f"Total tokens: {context.total_tokens} across {context.total_chunks} chunks"
+            )
             print(f"Average tokens per chunk: {avg_tokens_per_chunk:.1f}")
 
     def test_retrieval_stats_accuracy(self, retriever):
@@ -259,7 +294,10 @@ class TestKnowledgeRetrieverIntegration:
         stats = context.retrieval_stats
 
         # Time components should add up
-        assert abs(stats.total_time_ms - (stats.search_time_ms + stats.expansion_time_ms)) < 1.0
+        assert (
+            abs(stats.total_time_ms - (stats.search_time_ms + stats.expansion_time_ms))
+            < 1.0
+        )
 
         # Counts should match actual results
         assert stats.primary_count == len(context.primary_chunks)
@@ -274,5 +312,9 @@ class TestKnowledgeRetrieverIntegration:
         assert 0 <= stats.depth_reached <= 3
         assert stats.circular_refs_detected >= 0
 
-        print(f"Stats: search={stats.search_time_ms:.1f}ms, expansion={stats.expansion_time_ms:.1f}ms")
-        print(f"Depth: {stats.depth_reached}, Circular refs: {stats.circular_refs_detected}")
+        print(
+            f"Stats: search={stats.search_time_ms:.1f}ms, expansion={stats.expansion_time_ms:.1f}ms"
+        )
+        print(
+            f"Depth: {stats.depth_reached}, Circular refs: {stats.circular_refs_detected}"
+        )

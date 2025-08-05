@@ -60,7 +60,9 @@ class ChunkAssembler:
 
         return {"id": element.element_id, "document": document, "metadata": metadata}
 
-    def _populate_referenced_by_for_splits(self, elements: List[ExtractedElement]) -> None:
+    def _populate_referenced_by_for_splits(
+        self, elements: List[ExtractedElement]
+    ) -> None:
         """
         Populate referenced_by lists for split elements based on their ref_ids.
         Similar to GraphBuilder._populate_referenced_by but for post-split elements.
@@ -78,13 +80,20 @@ class ChunkAssembler:
             for referenced_chunk_id in ref_ids.keys():
                 if referenced_chunk_id in element_lookup:
                     referenced_element = element_lookup[referenced_chunk_id]
-                    if element.element_id not in referenced_element.metadata["referenced_by"]:
-                        referenced_element.metadata["referenced_by"].append(element.element_id)
+                    if (
+                        element.element_id
+                        not in referenced_element.metadata["referenced_by"]
+                    ):
+                        referenced_element.metadata["referenced_by"].append(
+                            element.element_id
+                        )
 
     def _convert_to_yaml(self, content: Any) -> str:
         """Convert content to YAML format."""
         try:
-            return yaml.dump(content, default_flow_style=False, sort_keys=False, allow_unicode=True).strip()
+            return yaml.dump(
+                content, default_flow_style=False, sort_keys=False, allow_unicode=True
+            ).strip()
         except Exception:
             # Fallback for content that can't be serialized
             return str(content)
@@ -112,7 +121,9 @@ class ChunkAssembler:
 
         # Add content hash
         document = self._convert_to_yaml(element.content)
-        metadata["content_hash"] = hashlib.sha256(document.encode("utf-8")).hexdigest()[:16]
+        metadata["content_hash"] = hashlib.sha256(document.encode("utf-8")).hexdigest()[
+            :16
+        ]
 
         return metadata
 
@@ -127,7 +138,9 @@ class ChunkAssembler:
             method = element.metadata.get("method", "")
             return f"{path}/{method}"
         elif element.element_type == "component":
-            return element.metadata.get("component_name", element.element_id.split(":")[-1])
+            return element.metadata.get(
+                "component_name", element.element_id.split(":")[-1]
+            )
         else:
             # Fallback to last part of element ID
             return element.element_id.split(":")[-1]

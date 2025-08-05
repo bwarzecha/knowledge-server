@@ -72,7 +72,9 @@ class TestEmbeddingCache:
             ]
 
             # Initially all should be misses
-            results, miss_indices = cache.get_embeddings_batch(model_name, content_hashes)
+            results, miss_indices = cache.get_embeddings_batch(
+                model_name, content_hashes
+            )
             assert all(r is None for r in results)
             assert miss_indices == [0, 1, 2]
 
@@ -80,7 +82,9 @@ class TestEmbeddingCache:
             cache.set_embeddings_batch(model_name, content_hashes[:2], embeddings[:2])
 
             # Now we should have partial hits
-            results, miss_indices = cache.get_embeddings_batch(model_name, content_hashes)
+            results, miss_indices = cache.get_embeddings_batch(
+                model_name, content_hashes
+            )
             assert results[0] is not None and np.array_equal(results[0], embeddings[0])
             assert results[1] is not None and np.array_equal(results[1], embeddings[1])
             assert results[2] is None
@@ -94,7 +98,9 @@ class TestEmbeddingCache:
             cache = EmbeddingCache(cache_path)
 
             # Load test model
-            model = load_embedding_model("sentence-transformers/all-MiniLM-L6-v2", device="cpu")
+            model = load_embedding_model(
+                "sentence-transformers/all-MiniLM-L6-v2", device="cpu"
+            )
             model_name = "sentence-transformers/all-MiniLM-L6-v2"
 
             # Test text

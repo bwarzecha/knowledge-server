@@ -42,7 +42,9 @@ class TestOpenAPIValidator:
         result = validator.validate(spec_data)
 
         assert result.is_valid is False
-        assert any("Missing required 'openapi' field" in error for error in result.errors)
+        assert any(
+            "Missing required 'openapi' field" in error for error in result.errors
+        )
 
     def test_validate_missing_info_section(self):
         """Test validation failure when info section is missing."""
@@ -52,7 +54,9 @@ class TestOpenAPIValidator:
         result = validator.validate(spec_data)
 
         assert result.is_valid is False
-        assert any("Missing required 'info' section" in error for error in result.errors)
+        assert any(
+            "Missing required 'info' section" in error for error in result.errors
+        )
 
     def test_validate_missing_title_in_info(self):
         """Test validation failure when info.title is missing."""
@@ -72,7 +76,9 @@ class TestOpenAPIValidator:
         result = validator.validate(spec_data)
 
         assert result.is_valid is False
-        assert any("missing required 'version' field" in error for error in result.errors)
+        assert any(
+            "missing required 'version' field" in error for error in result.errors
+        )
 
     def test_validate_missing_paths_and_components(self):
         """Test validation failure when both paths and components are missing."""
@@ -85,7 +91,10 @@ class TestOpenAPIValidator:
         result = validator.validate(spec_data)
 
         assert result.is_valid is False
-        assert any("must have either 'paths' or 'components'" in error for error in result.errors)
+        assert any(
+            "must have either 'paths' or 'components'" in error
+            for error in result.errors
+        )
 
     def test_validate_version_comparison(self):
         """Test OpenAPI version comparison logic."""

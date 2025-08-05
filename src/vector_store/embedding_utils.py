@@ -29,7 +29,9 @@ def load_embedding_model(model_name: str, device: str = "mps") -> SentenceTransf
         logger.info(f"Loading embedding model {model_name} on device {device}")
         # For Stella models, need trust_remote_code=True
         if "stella" in model_name.lower():
-            model = SentenceTransformer(model_name, device=device, trust_remote_code=True)
+            model = SentenceTransformer(
+                model_name, device=device, trust_remote_code=True
+            )
         else:
             model = SentenceTransformer(model_name, device=device)
         logger.info(f"Successfully loaded model {model_name}")
@@ -54,12 +56,16 @@ def get_token_count(text: str, encoding_name: str = "cl100k_base") -> int:
         encoding = tiktoken.get_encoding(encoding_name)
         return len(encoding.encode(text))
     except Exception as e:
-        logger.warning(f"Failed to get token count with tiktoken: {e}. Using character approximation.")
+        logger.warning(
+            f"Failed to get token count with tiktoken: {e}. Using character approximation."
+        )
         # Fallback to character approximation
         return len(text) // 4
 
 
-def trim_text_to_token_limit(text: str, max_tokens: int = 512, encoding_name: str = "cl100k_base") -> str:
+def trim_text_to_token_limit(
+    text: str, max_tokens: int = 512, encoding_name: str = "cl100k_base"
+) -> str:
     """
     Trim text to exact token limit using tiktoken.
 
@@ -100,14 +106,18 @@ def trim_text_to_token_limit(text: str, max_tokens: int = 512, encoding_name: st
         return trimmed_text
 
     except Exception as e:
-        logger.warning(f"Failed to trim with tiktoken: {e}. Using character approximation.")
+        logger.warning(
+            f"Failed to trim with tiktoken: {e}. Using character approximation."
+        )
         # Fallback to character approximation
         max_chars = max_tokens * 4
         if len(text) <= max_chars:
             return text
 
         trimmed = text[: max_chars - 3] + "..."
-        logger.warning(f"Text trimmed from {len(text)} to {len(trimmed)} characters (token limit: {max_tokens})")
+        logger.warning(
+            f"Text trimmed from {len(text)} to {len(trimmed)} characters (token limit: {max_tokens})"
+        )
         return trimmed
 
 
@@ -139,17 +149,23 @@ def encode_documents(
     # Trim texts if token limit specified
     processed_texts = texts
     if max_tokens:
-        processed_texts = [trim_text_to_token_limit(text, max_tokens, encoding_name) for text in texts]
+        processed_texts = [
+            trim_text_to_token_limit(text, max_tokens, encoding_name) for text in texts
+        ]
 
     # If cache is provided, try to get cached embeddings
     if cache and content_hashes and len(content_hashes) == len(texts):
         # Try to get model name from various attributes
         model_name = str(model)
-        if hasattr(model, "model_card_data") and isinstance(model.model_card_data, dict):
+        if hasattr(model, "model_card_data") and isinstance(
+            model.model_card_data, dict
+        ):
             model_name = model.model_card_data.get("model_name", model_name)
         elif hasattr(model, "model_name"):
             model_name = model.model_name
-        cached_embeddings, miss_indices = cache.get_embeddings_batch(model_name, content_hashes)
+        cached_embeddings, miss_indices = cache.get_embeddings_batch(
+            model_name, content_hashes
+        )
 
         # If all embeddings are cached, return them
         if not miss_indices:
@@ -158,7 +174,9 @@ def encode_documents(
 
         # Compute only missing embeddings
         if miss_indices:
-            logger.info(f"Cache hit for {len(texts) - len(miss_indices)}/{len(texts)} embeddings")
+            logger.info(
+                f"Cache hit for {len(texts) - len(miss_indices)}/{len(texts)} embeddings"
+            )
             texts_to_encode = [processed_texts[i] for i in miss_indices]
 
             try:
@@ -167,7 +185,9 @@ def encode_documents(
 
                 # Store new embeddings in cache
                 hashes_to_cache = [content_hashes[i] for i in miss_indices]
-                cache.set_embeddings_batch(model_name, hashes_to_cache, [emb for emb in new_embeddings])
+                cache.set_embeddings_batch(
+                    model_name, hashes_to_cache, [emb for emb in new_embeddings]
+                )
 
                 # Combine cached and new embeddings
                 result = []
@@ -194,11 +214,15 @@ def encode_documents(
         if cache and content_hashes and len(content_hashes) == len(texts):
             # Try to get model name from various attributes
             model_name = str(model)
-            if hasattr(model, "model_card_data") and isinstance(model.model_card_data, dict):
+            if hasattr(model, "model_card_data") and isinstance(
+                model.model_card_data, dict
+            ):
                 model_name = model.model_card_data.get("model_name", model_name)
             elif hasattr(model, "model_name"):
                 model_name = model.model_name
-            cache.set_embeddings_batch(model_name, content_hashes, [emb for emb in embeddings])
+            cache.set_embeddings_batch(
+                model_name, content_hashes, [emb for emb in embeddings]
+            )
 
         # Convert numpy array to list of lists - SentenceTransformer returns numpy array by default
         return embeddings.tolist()
@@ -251,7 +275,9 @@ def encode_query(
                 embedding = model.encode([processed_query], prompt_name="s2p_query")[0]
                 return embedding.tolist()
             except (TypeError, AttributeError, KeyError) as e:
-                logger.warning(f"Failed to use s2p_query prompt for Stella model: {e}. Using default encoding.")
+                logger.warning(
+                    f"Failed to use s2p_query prompt for Stella model: {e}. Using default encoding."
+                )
 
         # For Qwen3 models, use query prompt for better search performance
         elif "qwen" in model_name:
@@ -259,7 +285,9 @@ def encode_query(
                 embedding = model.encode([processed_query], prompt_name="query")[0]
                 return embedding.tolist()
             except (TypeError, AttributeError, KeyError) as e:
-                logger.warning(f"Failed to use query prompt for Qwen model: {e}. Using default encoding.")
+                logger.warning(
+                    f"Failed to use query prompt for Qwen model: {e}. Using default encoding."
+                )
 
         # Standard encoding without prompt (fallback for all models)
         embedding = model.encode([processed_query])[0]
@@ -270,7 +298,9 @@ def encode_query(
         raise
 
 
-def validate_embedding_dimensions(embeddings: List[List[float]], expected_dim: Optional[int] = None) -> bool:
+def validate_embedding_dimensions(
+    embeddings: List[List[float]], expected_dim: Optional[int] = None
+) -> bool:
     """
     Validate that embeddings have consistent dimensions.
 
@@ -291,7 +321,9 @@ def validate_embedding_dimensions(embeddings: List[List[float]], expected_dim: O
     # Check all embeddings have expected dimension
     for i, embedding in enumerate(embeddings):
         if len(embedding) != expected_dim:
-            logger.error(f"Embedding {i} has dimension {len(embedding)}, expected {expected_dim}")
+            logger.error(
+                f"Embedding {i} has dimension {len(embedding)}, expected {expected_dim}"
+            )
             return False
 
     return True

@@ -45,7 +45,9 @@ class EmbeddingCache:
         cache_key = self._compute_cache_key(model_name, content_hash)
 
         with sqlite3.connect(self.cache_path) as conn:
-            cursor = conn.execute("SELECT embedding FROM embeddings WHERE cache_key = ?", (cache_key,))
+            cursor = conn.execute(
+                "SELECT embedding FROM embeddings WHERE cache_key = ?", (cache_key,)
+            )
             row = cursor.fetchone()
 
             if row:
@@ -85,7 +87,9 @@ class EmbeddingCache:
 
         return embeddings, miss_indices
 
-    def set_embeddings_batch(self, model_name: str, content_hashes: List[str], embeddings: List[np.ndarray]):
+    def set_embeddings_batch(
+        self, model_name: str, content_hashes: List[str], embeddings: List[np.ndarray]
+    ):
         """Store multiple embeddings in cache."""
         for content_hash, embedding in zip(content_hashes, embeddings):
             self.set_embedding(model_name, content_hash, embedding)

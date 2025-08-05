@@ -27,21 +27,37 @@ def main():
 
     # Index command
     index_parser = subparsers.add_parser(
-        "index", help="Build vector store and API index from OpenAPI specs and markdown files"
-    )
-    index_parser.add_argument("--config", help="Path to .env configuration file", default=None)
-    index_parser.add_argument("--skip-openapi", action="store_true", help="Skip processing OpenAPI specifications")
-    index_parser.add_argument("--skip-markdown", action="store_true", help="Skip processing markdown files")
-    index_parser.add_argument(
-        "--max-tokens", type=int, help="Maximum tokens per markdown chunk (default: 1000, max: 8000)"
+        "index",
+        help="Build vector store and API index from OpenAPI specs and markdown files",
     )
     index_parser.add_argument(
-        "--markdown-dir", help="Directory containing markdown files (default: same as OpenAPI specs directory)"
+        "--config", help="Path to .env configuration file", default=None
+    )
+    index_parser.add_argument(
+        "--skip-openapi",
+        action="store_true",
+        help="Skip processing OpenAPI specifications",
+    )
+    index_parser.add_argument(
+        "--skip-markdown", action="store_true", help="Skip processing markdown files"
+    )
+    index_parser.add_argument(
+        "--max-tokens",
+        type=int,
+        help="Maximum tokens per markdown chunk (default: 1000, max: 8000)",
+    )
+    index_parser.add_argument(
+        "--markdown-dir",
+        help="Directory containing markdown files (default: same as OpenAPI specs directory)",
     )
 
     # Serve command
-    serve_parser = subparsers.add_parser("serve", help="Start MCP server using pre-built indices")
-    serve_parser.add_argument("--config", help="Path to .env configuration file", default=None)
+    serve_parser = subparsers.add_parser(
+        "serve", help="Start MCP server using pre-built indices"
+    )
+    serve_parser.add_argument(
+        "--config", help="Path to .env configuration file", default=None
+    )
     serve_parser.add_argument(
         "-v",
         "--verbose",
@@ -50,7 +66,9 @@ def main():
     )
 
     # Ask command
-    ask_parser = subparsers.add_parser("ask", help="Ask questions about API documentation (test askAPI functionality)")
+    ask_parser = subparsers.add_parser(
+        "ask", help="Ask questions about API documentation (test askAPI functionality)"
+    )
     ask_parser.add_argument("query", help="Question to ask about the API documentation")
     ask_parser.add_argument(
         "--max-response-length",
@@ -75,7 +93,9 @@ def main():
         default=3,
         help="Maximum reference expansion depth (default: 3)",
     )
-    ask_parser.add_argument("--config", help="Path to .env configuration file", default=None)
+    ask_parser.add_argument(
+        "--config", help="Path to .env configuration file", default=None
+    )
     ask_parser.add_argument(
         "-v",
         "--verbose",
@@ -84,9 +104,15 @@ def main():
     )
 
     # Research command
-    research_parser = subparsers.add_parser("research", help="Research questions using intelligent ReAct agent")
-    research_parser.add_argument("question", help="Research question about API documentation")
-    research_parser.add_argument("--config", help="Path to .env configuration file", default=None)
+    research_parser = subparsers.add_parser(
+        "research", help="Research questions using intelligent ReAct agent"
+    )
+    research_parser.add_argument(
+        "question", help="Research question about API documentation"
+    )
+    research_parser.add_argument(
+        "--config", help="Path to .env configuration file", default=None
+    )
     research_parser.add_argument(
         "-v",
         "--verbose",

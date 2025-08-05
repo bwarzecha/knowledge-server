@@ -144,7 +144,9 @@ class AdaptiveSectionSplitter:
         """Count tokens in text using tiktoken."""
         return len(self.tokenizer.encode(text))
 
-    def _calculate_section_boundaries(self, headers: List[Header], content: str) -> List[SectionBoundary]:
+    def _calculate_section_boundaries(
+        self, headers: List[Header], content: str
+    ) -> List[SectionBoundary]:
         """Calculate content boundaries for each header section."""
         boundaries = []
         content_length = len(content)
@@ -205,7 +207,9 @@ class AdaptiveSectionSplitter:
 
         return boundaries
 
-    def _group_by_top_level(self, boundaries: List[SectionBoundary]) -> List[List[SectionBoundary]]:
+    def _group_by_top_level(
+        self, boundaries: List[SectionBoundary]
+    ) -> List[List[SectionBoundary]]:
         """Group boundaries by top-level sections (H1, or H2 if no H1)."""
         if not boundaries:
             return []
@@ -235,7 +239,9 @@ class AdaptiveSectionSplitter:
 
         return groups
 
-    def _adaptive_split_section(self, section_group: List[SectionBoundary], full_content: str) -> List[SectionData]:
+    def _adaptive_split_section(
+        self, section_group: List[SectionBoundary], full_content: str
+    ) -> List[SectionData]:
         """Apply adaptive splitting to a top-level section group."""
         if not section_group:
             return []
@@ -261,7 +267,9 @@ class AdaptiveSectionSplitter:
         # Section too large - needs splitting
         return self._split_large_section(section_group, full_content)
 
-    def _split_large_section(self, section_group: List[SectionBoundary], full_content: str) -> List[SectionData]:
+    def _split_large_section(
+        self, section_group: List[SectionBoundary], full_content: str
+    ) -> List[SectionData]:
         """Split a large section into smaller chunks with context preservation."""
         if len(section_group) == 1:
             # Single boundary that's too large - try to split by paragraphs or keep as is
@@ -291,7 +299,9 @@ class AdaptiveSectionSplitter:
         # Create context string from main header
         main_context = ""
         if main_boundary.header:
-            main_context = f"{'#' * main_boundary.header.level} {main_boundary.header.text}"
+            main_context = (
+                f"{'#' * main_boundary.header.level} {main_boundary.header.text}"
+            )
 
             # Add any content before first sub-boundary
             main_content_lines = main_boundary.content.split("\n")
@@ -324,8 +334,14 @@ class AdaptiveSectionSplitter:
                     token_count=first_tokens,
                     is_split_section=True,
                     split_index=1,
-                    total_splits=(len(sub_boundaries) + 1 if len(sub_boundaries) > 1 else 1),
-                    split_parent_id=(self._generate_section_id(main_boundary.header) if main_boundary.header else None),
+                    total_splits=(
+                        len(sub_boundaries) + 1 if len(sub_boundaries) > 1 else 1
+                    ),
+                    split_parent_id=(
+                        self._generate_section_id(main_boundary.header)
+                        if main_boundary.header
+                        else None
+                    ),
                 )
             )
 
@@ -351,8 +367,14 @@ class AdaptiveSectionSplitter:
                     token_count=token_count,
                     is_split_section=True,
                     split_index=i,
-                    total_splits=(len(sub_boundaries) + 1 if len(sub_boundaries) > 1 else 1),
-                    split_parent_id=(self._generate_section_id(main_boundary.header) if main_boundary.header else None),
+                    total_splits=(
+                        len(sub_boundaries) + 1 if len(sub_boundaries) > 1 else 1
+                    ),
+                    split_parent_id=(
+                        self._generate_section_id(main_boundary.header)
+                        if main_boundary.header
+                        else None
+                    ),
                     parent_context=main_context,
                 )
             )

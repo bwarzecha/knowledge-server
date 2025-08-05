@@ -7,7 +7,9 @@ class LLMProvider(ABC):
     """Abstract base class for LLM providers."""
 
     @abstractmethod
-    def generate(self, prompt: str, temperature: float = 0.2, max_tokens: int = 200) -> str:
+    def generate(
+        self, prompt: str, temperature: float = 0.2, max_tokens: int = 200
+    ) -> str:
         """Generate text from prompt."""
 
     @abstractmethod
@@ -21,12 +23,18 @@ class LLMClient:
     def __init__(self, provider: LLMProvider):
         self.provider = provider
 
-    def generate(self, prompt: str, temperature: float = 0.2, max_tokens: int = 200) -> str:
+    def generate(
+        self, prompt: str, temperature: float = 0.2, max_tokens: int = 200
+    ) -> str:
         """Generate text using configured provider."""
         if not self.provider.is_available():
-            raise RuntimeError(f"LLM provider {type(self.provider).__name__} is not available")
+            raise RuntimeError(
+                f"LLM provider {type(self.provider).__name__} is not available"
+            )
 
-        return self.provider.generate(prompt, temperature=temperature, max_tokens=max_tokens)
+        return self.provider.generate(
+            prompt, temperature=temperature, max_tokens=max_tokens
+        )
 
     def is_available(self) -> bool:
         """Check if LLM is available."""

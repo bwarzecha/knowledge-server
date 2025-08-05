@@ -3,7 +3,8 @@
 import os
 
 from src.cli.config import Config
-from src.retriever.data_classes import Chunk, KnowledgeContext, RetrievalStats, RetrieverConfig
+from src.retriever.data_classes import (Chunk, KnowledgeContext,
+                                        RetrievalStats, RetrieverConfig)
 
 
 class TestDataClasses:

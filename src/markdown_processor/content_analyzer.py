@@ -53,9 +53,13 @@ class ContentAnalyzer:
         """Recursively ensure all values in an object are JSON serializable and ChromaDB compatible."""
         if isinstance(obj, dict):
             # Convert None values to empty strings but keep the keys
-            return {key: self._ensure_json_serializable(value) for key, value in obj.items()}
+            return {
+                key: self._ensure_json_serializable(value) for key, value in obj.items()
+            }
         elif isinstance(obj, list):
-            return [self._ensure_json_serializable(item) for item in obj if item is not None]
+            return [
+                self._ensure_json_serializable(item) for item in obj if item is not None
+            ]
         elif obj is None:
             return ""  # Convert None to empty string for ChromaDB compatibility
         else:
@@ -87,9 +91,13 @@ class ContentAnalyzer:
 
         # Analyze content characteristics
         metadata.word_count = self.reference_scanner.count_words(section.content)
-        metadata.has_code_blocks = self.reference_scanner.has_code_blocks(section.content)
+        metadata.has_code_blocks = self.reference_scanner.has_code_blocks(
+            section.content
+        )
         metadata.has_tables = self.reference_scanner.has_tables(section.content)
-        metadata.has_images = len(self.reference_scanner.find_image_references(section.content)) > 0
+        metadata.has_images = (
+            len(self.reference_scanner.find_image_references(section.content)) > 0
+        )
 
         # Analyze references and links
         refs = self.reference_scanner.scan_references(section.content, source_file)
@@ -115,7 +123,9 @@ class ContentAnalyzer:
 
         return metadata
 
-    def analyze_document_context(self, frontmatter: Dict[str, Any] = None, source_file: str = None) -> Dict[str, Any]:
+    def analyze_document_context(
+        self, frontmatter: Dict[str, Any] = None, source_file: str = None
+    ) -> Dict[str, Any]:
         """
         Extract document-level context metadata.
 
@@ -210,7 +220,11 @@ class ContentAnalyzer:
             "type": self._get_section_type(section),
             "source_file": "",  # Will be set by caller
             "section_level": section.header.level if section.header else 0,
-            "title": (section.header.text if section.header else document_context.get("document_title", "")),
+            "title": (
+                section.header.text
+                if section.header
+                else document_context.get("document_title", "")
+            ),
             # Navigation metadata
             "section_path": navigation_meta.get("section_path", ""),
             "previous_chunk": navigation_meta.get("previous_chunk"),
@@ -314,7 +328,9 @@ class ContentAnalyzer:
         if "word_count" in metadata and not isinstance(metadata["word_count"], int):
             errors.append("word_count must be an integer")
 
-        if "section_level" in metadata and not isinstance(metadata["section_level"], int):
+        if "section_level" in metadata and not isinstance(
+            metadata["section_level"], int
+        ):
             errors.append("section_level must be an integer")
 
         # Check list fields

@@ -42,7 +42,9 @@ class OpenAPIParser:
         try:
             content = file_path.read_text(encoding="utf-8")
         except UnicodeDecodeError as e:
-            return ParseResult(success=False, error=f"Unable to read file as UTF-8: {e}")
+            return ParseResult(
+                success=False, error=f"Unable to read file as UTF-8: {e}"
+            )
         except Exception as e:
             return ParseResult(success=False, error=f"Error reading file: {e}")
 
@@ -55,7 +57,9 @@ class OpenAPIParser:
         elif file_type == "yaml":
             return self._parse_yaml(content, file_type)
         else:
-            return ParseResult(success=False, error=f"Unsupported file extension: {file_path.suffix}")
+            return ParseResult(
+                success=False, error=f"Unsupported file extension: {file_path.suffix}"
+            )
 
     def _get_file_type(self, file_path: Path) -> str:
         """Determine file type from extension."""
@@ -73,9 +77,13 @@ class OpenAPIParser:
             data = json.loads(content)
             return ParseResult(success=True, data=data, file_type=file_type)
         except json.JSONDecodeError as e:
-            return ParseResult(success=False, error=f"Invalid JSON format: {e}", file_type=file_type)
+            return ParseResult(
+                success=False, error=f"Invalid JSON format: {e}", file_type=file_type
+            )
         except Exception as e:
-            return ParseResult(success=False, error=f"Error parsing JSON: {e}", file_type=file_type)
+            return ParseResult(
+                success=False, error=f"Error parsing JSON: {e}", file_type=file_type
+            )
 
     def _parse_yaml(self, content: str, file_type: str) -> ParseResult:
         """Parse YAML content."""
@@ -83,6 +91,10 @@ class OpenAPIParser:
             data = yaml.safe_load(content)
             return ParseResult(success=True, data=data, file_type=file_type)
         except yaml.YAMLError as e:
-            return ParseResult(success=False, error=f"Invalid YAML format: {e}", file_type=file_type)
+            return ParseResult(
+                success=False, error=f"Invalid YAML format: {e}", file_type=file_type
+            )
         except Exception as e:
-            return ParseResult(success=False, error=f"Error parsing YAML: {e}", file_type=file_type)
+            return ParseResult(
+                success=False, error=f"Error parsing YAML: {e}", file_type=file_type
+            )

@@ -36,7 +36,9 @@ class TestOpenAPIParser:
     def test_parse_real_json_sample(self):
         """Test parsing a real JSON sample file."""
         parser = OpenAPIParser()
-        result = parser.parse_file("open-api-small-samples/3.0/json/petstore-simple.json")
+        result = parser.parse_file(
+            "open-api-small-samples/3.0/json/petstore-simple.json"
+        )
 
         assert result.success is True
         assert result.data is not None
@@ -48,7 +50,9 @@ class TestOpenAPIParser:
     def test_parse_real_yaml_sample(self):
         """Test parsing a real YAML sample file."""
         parser = OpenAPIParser()
-        result = parser.parse_file("open-api-small-samples/3.0/yaml/petstore-simple.yaml")
+        result = parser.parse_file(
+            "open-api-small-samples/3.0/yaml/petstore-simple.yaml"
+        )
 
         assert result.success is True
         assert result.data is not None
@@ -105,7 +109,9 @@ class TestOpenAPIParser:
     def test_parse_with_path_object(self):
         """Test parsing using a Path object instead of string."""
         parser = OpenAPIParser()
-        result = parser.parse_file(Path("open-api-small-samples/3.0/json/petstore-simple.json"))
+        result = parser.parse_file(
+            Path("open-api-small-samples/3.0/json/petstore-simple.json")
+        )
 
         assert result.success is True
         assert result.data is not None

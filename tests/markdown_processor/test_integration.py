@@ -6,7 +6,8 @@ from src.markdown_processor.chunk_assembler import ChunkAssembler
 from src.markdown_processor.header_extractor import HeaderExtractor
 from src.markdown_processor.parser import MarkdownParser
 from src.markdown_processor.scanner import DirectoryScanner
-from src.markdown_processor.section_splitter import AdaptiveSectionSplitter, SplittingConfig
+from src.markdown_processor.section_splitter import (AdaptiveSectionSplitter,
+                                                     SplittingConfig)
 
 
 class TestMarkdownProcessorIntegration:
@@ -38,11 +39,15 @@ class TestMarkdownProcessorIntegration:
         headers = header_extractor.extract_headers(parse_result.content)
 
         # Phase 3: Split sections
-        sections = splitter.split_content(parse_result.content, headers, parse_result.frontmatter)
+        sections = splitter.split_content(
+            parse_result.content, headers, parse_result.frontmatter
+        )
         assert len(sections) > 0
 
         # Phase 4: Assemble chunks
-        chunks = assembler.assemble_chunks(sections, parse_result.frontmatter, first_file)
+        chunks = assembler.assemble_chunks(
+            sections, parse_result.frontmatter, first_file
+        )
         assert len(chunks) == len(sections)
 
         # Verify chunk structure
@@ -88,8 +93,12 @@ class TestMarkdownProcessorIntegration:
 
         parse_result = parser.parse_file(sample_file)
         headers = header_extractor.extract_headers(parse_result.content)
-        sections = splitter.split_content(parse_result.content, headers, parse_result.frontmatter)
-        chunks = assembler.assemble_chunks(sections, parse_result.frontmatter, "test.md")
+        sections = splitter.split_content(
+            parse_result.content, headers, parse_result.frontmatter
+        )
+        chunks = assembler.assemble_chunks(
+            sections, parse_result.frontmatter, "test.md"
+        )
 
         # Build chunk lookup
         chunk_lookup = {chunk["id"]: chunk for chunk in chunks}
@@ -196,8 +205,12 @@ More content."""
         # Parse with frontmatter
         parse_result = parser.parse_content(test_content)
         headers = header_extractor.extract_headers(parse_result.content)
-        sections = splitter.split_content(parse_result.content, headers, parse_result.frontmatter)
-        chunks = assembler.assemble_chunks(sections, parse_result.frontmatter, "test.md")
+        sections = splitter.split_content(
+            parse_result.content, headers, parse_result.frontmatter
+        )
+        chunks = assembler.assemble_chunks(
+            sections, parse_result.frontmatter, "test.md"
+        )
 
         # Check frontmatter propagation
         for chunk in chunks:
@@ -211,7 +224,9 @@ More content."""
     def test_split_section_handling(self):
         """Test handling of split sections with large content."""
         header_extractor = HeaderExtractor()
-        splitter = AdaptiveSectionSplitter(SplittingConfig(max_tokens=50, include_context_in_splits=True))
+        splitter = AdaptiveSectionSplitter(
+            SplittingConfig(max_tokens=50, include_context_in_splits=True)
+        )
         assembler = ChunkAssembler()
 
         # Create content that will force splitting
@@ -238,7 +253,9 @@ Final section with more content to ensure proper splitting behavior."""
         chunks = assembler.assemble_chunks(sections, None, "test.md")
 
         # Find split sections
-        split_chunks = [c for c in chunks if c["metadata"].get("is_split_section", False)]
+        split_chunks = [
+            c for c in chunks if c["metadata"].get("is_split_section", False)
+        ]
 
         if split_chunks:
             # Verify split metadata
@@ -250,7 +267,9 @@ Final section with more content to ensure proper splitting behavior."""
 
                 # Check context preservation in splits
                 if metadata["split_index"] > 1:
-                    assert "Large Document" in chunk["document"] or metadata.get("hierarchical_context")
+                    assert "Large Document" in chunk["document"] or metadata.get(
+                        "hierarchical_context"
+                    )
 
     def test_reference_extraction(self):
         """Test that references are extracted correctly."""

@@ -38,12 +38,18 @@ class ContextAssembler:
             Complete KnowledgeContext object
         """
         # Convert raw chunks to Chunk objects
-        primary_chunk_objects = self._convert_to_chunk_objects(primary_chunks, "primary_result")
+        primary_chunk_objects = self._convert_to_chunk_objects(
+            primary_chunks, "primary_result"
+        )
 
-        referenced_chunk_objects = self._convert_to_chunk_objects(referenced_chunks, "referenced_dependency")
+        referenced_chunk_objects = self._convert_to_chunk_objects(
+            referenced_chunks, "referenced_dependency"
+        )
 
         # Apply context size limits if needed
-        primary_final, referenced_final = self._apply_size_limits(primary_chunk_objects, referenced_chunk_objects)
+        primary_final, referenced_final = self._apply_size_limits(
+            primary_chunk_objects, referenced_chunk_objects
+        )
 
         # Calculate total token count
         total_tokens = self._estimate_total_tokens(primary_final + referenced_final)
@@ -75,7 +81,9 @@ class ContextAssembler:
 
         return context
 
-    def _convert_to_chunk_objects(self, raw_chunks: List[Dict[str, Any]], retrieval_reason: str) -> List[Chunk]:
+    def _convert_to_chunk_objects(
+        self, raw_chunks: List[Dict[str, Any]], retrieval_reason: str
+    ) -> List[Chunk]:
         """Convert raw chunks to Chunk objects with relevance scores."""
         chunk_objects = []
 
@@ -112,7 +120,9 @@ class ContextAssembler:
 
         # Apply 60/40 prioritization strategy
         if self.config.prioritize_primary:
-            primary_limit = min(len(primary_chunks), int(self.config.max_total_chunks * 0.6))
+            primary_limit = min(
+                len(primary_chunks), int(self.config.max_total_chunks * 0.6)
+            )
             reference_limit = self.config.max_total_chunks - primary_limit
         else:
             # Equal split if not prioritizing primary
@@ -123,7 +133,9 @@ class ContextAssembler:
         primary_final = primary_chunks[:primary_limit]
 
         # Sort referenced chunks by relevance and take top N
-        referenced_sorted = sorted(referenced_chunks, key=lambda x: x.relevance_score, reverse=True)
+        referenced_sorted = sorted(
+            referenced_chunks, key=lambda x: x.relevance_score, reverse=True
+        )
         referenced_final = referenced_sorted[:reference_limit]
 
         if total_chunks > self.config.max_total_chunks:

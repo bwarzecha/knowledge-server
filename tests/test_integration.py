@@ -13,7 +13,9 @@ class TestOpenAPIProcessorIntegration:
         processor = OpenAPIProcessor(config)
 
         # Process just one simple file by targeting a specific sample
-        chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
+        chunks = processor.process_directory(
+            "open-api-small-samples/3.0/json/openapi-workshop"
+        )
 
         assert len(chunks) > 0
 
@@ -50,7 +52,9 @@ class TestOpenAPIProcessorIntegration:
         processor = OpenAPIProcessor(config)
 
         # Use a sample with known references
-        chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
+        chunks = processor.process_directory(
+            "open-api-small-samples/3.0/json/openapi-workshop"
+        )
 
         # Find chunks with references
         chunks_with_refs = [c for c in chunks if c["metadata"]["ref_ids"]]
@@ -68,14 +72,18 @@ class TestOpenAPIProcessorIntegration:
                         referenced_chunk = next(c for c in chunks if c["id"] == ref_id)
 
                         # The referenced chunk should have this chunk in its referenced_by list
-                        assert chunk["id"] in referenced_chunk["metadata"]["referenced_by"]
+                        assert (
+                            chunk["id"] in referenced_chunk["metadata"]["referenced_by"]
+                        )
 
     def test_content_preservation(self):
         """Test that original OpenAPI content is preserved in chunks."""
         config = Config()
         processor = OpenAPIProcessor(config)
 
-        chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
+        chunks = processor.process_directory(
+            "open-api-small-samples/3.0/json/openapi-workshop"
+        )
 
         # Find an info chunk and verify it contains expected info fields
         info_chunks = [c for c in chunks if c["metadata"]["type"] == "info"]
@@ -99,7 +107,9 @@ class TestOpenAPIProcessorIntegration:
         processor = OpenAPIProcessor(config)
 
         # Test JSON files
-        json_chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
+        json_chunks = processor.process_directory(
+            "open-api-small-samples/3.0/json/openapi-workshop"
+        )
 
         # Test YAML files
         yaml_chunks = processor.process_directory("open-api-small-samples/3.0/yaml")

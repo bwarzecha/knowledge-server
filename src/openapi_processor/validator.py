@@ -57,10 +57,14 @@ class OpenAPIValidator:
             ValidationResult with validation status and any errors/warnings
         """
         if spec_data is None:
-            return ValidationResult(is_valid=False, errors=["Specification data is None"])
+            return ValidationResult(
+                is_valid=False, errors=["Specification data is None"]
+            )
 
         if not isinstance(spec_data, dict):
-            return ValidationResult(is_valid=False, errors=["Specification data must be a dictionary"])
+            return ValidationResult(
+                is_valid=False, errors=["Specification data must be a dictionary"]
+            )
 
         errors = []
         warnings = []
@@ -86,7 +90,9 @@ class OpenAPIValidator:
         structure_errors = self._validate_structure(spec_data)
         errors.extend(structure_errors)
 
-        return ValidationResult(is_valid=len(errors) == 0, errors=errors, warnings=warnings)
+        return ValidationResult(
+            is_valid=len(errors) == 0, errors=errors, warnings=warnings
+        )
 
     def _validate_openapi_version(self, spec_data: Dict[str, Any]) -> str:
         """Validate the openapi version field."""
@@ -100,9 +106,7 @@ class OpenAPIValidator:
 
         # Simple version comparison for OpenAPI versions (e.g., "3.0.0", "3.1.0")
         if not self._is_version_supported(openapi_version):
-            return (
-                f"OpenAPI version {openapi_version} is below minimum required version {self.config.min_openapi_version}"
-            )
+            return f"OpenAPI version {openapi_version} is below minimum required version {self.config.min_openapi_version}"
 
         return None
 
@@ -161,7 +165,9 @@ class OpenAPIValidator:
 
         # Validate components section if present
         if "components" in spec_data:
-            components_errors = self._validate_components_section(spec_data["components"])
+            components_errors = self._validate_components_section(
+                spec_data["components"]
+            )
             errors.extend(components_errors)
 
         return errors

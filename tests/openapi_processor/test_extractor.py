@@ -90,7 +90,9 @@ class TestElementExtractor:
 
         # Check specific operations
         get_pets = next(
-            e for e in operation_elements if e.metadata["path"] == "/pets" and e.metadata["method"] == "get"
+            e
+            for e in operation_elements
+            if e.metadata["path"] == "/pets" and e.metadata["method"] == "get"
         )
         assert get_pets.element_id == "api.json:paths/pets/get"
         assert get_pets.metadata["operation_id"] == "listPets"
@@ -98,7 +100,9 @@ class TestElementExtractor:
         assert "get" in get_pets.content
 
         post_pets = next(
-            e for e in operation_elements if e.metadata["path"] == "/pets" and e.metadata["method"] == "post"
+            e
+            for e in operation_elements
+            if e.metadata["path"] == "/pets" and e.metadata["method"] == "post"
         )
         assert post_pets.element_id == "api.json:paths/pets/post"
         assert post_pets.metadata["operation_id"] == "createPet"
@@ -146,16 +150,24 @@ class TestElementExtractor:
         assert len(component_elements) == 3
 
         # Check schema components
-        schema_elements = [e for e in component_elements if e.metadata["component_type"] == "schemas"]
+        schema_elements = [
+            e for e in component_elements if e.metadata["component_type"] == "schemas"
+        ]
         assert len(schema_elements) == 2
 
-        pet_schema = next(e for e in schema_elements if e.metadata["component_name"] == "Pet")
+        pet_schema = next(
+            e for e in schema_elements if e.metadata["component_name"] == "Pet"
+        )
         assert pet_schema.element_id == "api.yaml:components/schemas/Pet"
         assert pet_schema.metadata["component_type"] == "schemas"
         assert "Pet" in pet_schema.content
 
         # Check parameter component
-        param_elements = [e for e in component_elements if e.metadata["component_type"] == "parameters"]
+        param_elements = [
+            e
+            for e in component_elements
+            if e.metadata["component_type"] == "parameters"
+        ]
         assert len(param_elements) == 1
 
         param_element = param_elements[0]
@@ -165,7 +177,9 @@ class TestElementExtractor:
     def test_extract_real_petstore_sample(self):
         """Test extracting from real petstore sample file."""
         parser = OpenAPIParser()
-        parse_result = parser.parse_file("open-api-small-samples/3.0/json/petstore-simple.json")
+        parse_result = parser.parse_file(
+            "open-api-small-samples/3.0/json/petstore-simple.json"
+        )
 
         assert parse_result.success is True
 

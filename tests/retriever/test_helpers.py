@@ -10,7 +10,9 @@ def get_real_test_chunks() -> List[Dict[str, Any]]:
     """Get real chunks from openapi-workshop samples for testing."""
     config = Config()
     processor = OpenAPIProcessor(config)
-    chunks = processor.process_directory("open-api-small-samples/3.0/json/openapi-workshop")
+    chunks = processor.process_directory(
+        "open-api-small-samples/3.0/json/openapi-workshop"
+    )
     return chunks
 
 
@@ -65,7 +67,9 @@ def get_deep_reference_chain() -> List[Dict[str, Any]]:
 
     for chunk in chunks:
         # Look for operation chunks with schema references
-        if chunk["metadata"].get("type") == "operation" and chunk["metadata"].get("ref_ids"):
+        if chunk["metadata"].get("type") == "operation" and chunk["metadata"].get(
+            "ref_ids"
+        ):
             chain_chunks.append(chunk)
 
             # Add the referenced chunks to the chain
@@ -104,7 +108,9 @@ class MockVectorStore:
             if any(word in chunk["document"].lower() for word in query_lower.split()):
                 # Add mock distance score
                 chunk_with_distance = chunk.copy()
-                chunk_with_distance["distance"] = 0.1  # Mock low distance (high relevance)
+                chunk_with_distance["distance"] = (
+                    0.1  # Mock low distance (high relevance)
+                )
                 results.append(chunk_with_distance)
 
                 if len(results) >= limit:
