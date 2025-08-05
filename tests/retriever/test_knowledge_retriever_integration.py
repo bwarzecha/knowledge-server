@@ -285,6 +285,40 @@ class TestKnowledgeRetrieverIntegration:
             )
             print(f"Average tokens per chunk: {avg_tokens_per_chunk:.1f}")
 
+    def test_chunk_exclusion_functionality(self, retriever):
+        """Test that chunk exclusion works correctly."""
+        query = "hoot operations"
+
+        # First, get normal results to identify chunk IDs
+        context = retriever.retrieve_knowledge(query, max_total_chunks=5)
+        original_chunk_count = context.total_chunks
+        assert original_chunk_count > 0, "Should find some chunks for test query"
+
+        # Extract chunk IDs from primary chunks
+        chunk_ids_to_exclude = [chunk.id for chunk in context.primary_chunks[:2]]
+        assert len(chunk_ids_to_exclude) >= 1, "Should have at least 1 chunk to exclude"
+
+        # Now search with exclusion
+        excluded_context = retriever.retrieve_knowledge(
+            query, max_total_chunks=5, exclude_chunk_ids=chunk_ids_to_exclude
+        )
+
+        # Should have fewer chunks
+        assert (
+            excluded_context.total_chunks < original_chunk_count
+            or excluded_context.total_chunks == 0
+        )
+
+        # None of the excluded chunks should be in results
+        all_result_ids = {
+            chunk.id
+            for chunk in excluded_context.primary_chunks
+            + excluded_context.referenced_chunks
+        }
+        excluded_ids = set(chunk_ids_to_exclude)
+        overlap = all_result_ids.intersection(excluded_ids)
+        assert len(overlap) == 0, f"Excluded chunks {overlap} found in results"
+
     def test_retrieval_stats_accuracy(self, retriever):
         """Test that retrieval statistics are accurate."""
         query = "hoot operations"

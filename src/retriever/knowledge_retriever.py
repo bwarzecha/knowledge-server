@@ -84,7 +84,7 @@ class KnowledgeRetriever:
             exclude_set = set(exclude_chunk_ids)
             original_count = len(primary_chunks)
             primary_chunks = [
-                chunk for chunk in primary_chunks if chunk.id not in exclude_set
+                chunk for chunk in primary_chunks if chunk["id"] not in exclude_set
             ]
             excluded_count = original_count - len(primary_chunks)
             if excluded_count > 0:
@@ -120,7 +120,7 @@ class KnowledgeRetriever:
                     referenced_chunks = [
                         chunk
                         for chunk in referenced_chunks
-                        if chunk.id not in exclude_set
+                        if chunk["id"] not in exclude_set
                     ]
                     excluded_ref_count = original_ref_count - len(referenced_chunks)
                     if excluded_ref_count > 0:
